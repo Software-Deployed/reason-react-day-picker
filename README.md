@@ -18,10 +18,10 @@ Add `reason-react-day-picker` to `libraries` dune stanza:
 <DayPicker
   mode="range"
   selected={`Range({
-    from: Js.Nullable.return(openDate),
-    to_: Js.Nullable.return(closeDate),
+    DayPicker.from: Js.Nullable.return(openDate),
+    DayPicker.to_: Js.Nullable.return(closeDate),
   })}
-onSelect={`Range(dates => {
+onSelect={`Range((dates: DayPicker.rangeDate) => {
   let openDate =
     switch (dates.from->Js.Nullable.toOption) {
     | Some(date) => date
