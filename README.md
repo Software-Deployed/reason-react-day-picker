@@ -9,8 +9,10 @@ Add as OPAM dependency using pin:
 
 Add `reason-react-day-picker` to `libraries` dune stanza:
 
-```(libraries
- reason-react-day-picker)```
+```
+(libraries
+ reason-react-day-picker)
+```
 
 ```ocaml
 <DayPicker
