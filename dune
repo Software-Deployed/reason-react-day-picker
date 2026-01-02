@@ -1,6 +1,7 @@
 (library
  (wrapped false)
- (name reason_react_day_picker)
+ (modules ReactDayPicker)
+ (name react_day_picker)
  (public_name reason-react-day-picker)
  (modes melange)
  (libraries reason-react melange.js)
