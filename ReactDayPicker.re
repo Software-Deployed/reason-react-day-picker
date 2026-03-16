@@ -27,13 +27,14 @@ type footer =
   | FooterString(string)
   | FooterNode(React.element);
 
-type singleDate = Js.Nullable.t(Js.Date.t);
-type multipleDate = array(Js.Date.t);
-type rangeDate = {
+type singleDate = Js.Undefined.t(Js.Date.t);
+type multipleDate = Js.Undefined.t(array(Js.Date.t));
+type dateRange = {
   from: singleDate,
   [@mel.as "to"]
   to_: singleDate,
 };
+type rangeDate = Js.Undefined.t(dateRange);
 
 [@mel.obj]
 external makeProps:
@@ -94,8 +95,8 @@ external make:
   {
     ..
     "mode": string,
-    "onSelect": rangeDate => unit,
-    "selected": rangeDate,
+    "onSelect": 'onSelect,
+    "selected": 'selected,
     "captionLayout": captionLayout,
     "navLayout": navLayout,
     "disableNavigation": bool,

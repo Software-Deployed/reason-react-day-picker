@@ -17,23 +17,30 @@ Add `reason-react-day-picker` to `libraries` dune stanza:
 ```ocaml
 <DayPicker
   mode="range"
-  selected={`Range({
-    DayPicker.from: Js.Nullable.return(openDate),
-    DayPicker.to_: Js.Nullable.return(closeDate),
-  })}
-onSelect={`Range((dates: DayPicker.rangeDate) => {
-  let openDate =
-    switch (dates.from->Js.Nullable.toOption) {
-    | Some(date) => date
-    | None => today
-    };
-  let closeDate =
-    switch (dates.to_->Js.Nullable.toOption) {
-    | Some(date) => date
-    | None => openDate
-    };
-  updateOpenDate(openDate);
-  updateCloseDate(closeDate);
+  selected={`Range(Js.Undefined.return({
+    DayPicker.from: Js.Undefined.return(openDate),
+    DayPicker.to_: Js.Undefined.return(closeDate),
+  }))}
+  onSelect={`Range((dates: DayPicker.rangeDate) => {
+  switch (dates->Js.Undefined.toOption) {
+  | Some(dates) =>
+    let openDate =
+      switch (dates.from->Js.Undefined.toOption) {
+      | Some(date) => date
+      | None => today
+      };
+    let closeDate =
+      switch (dates.to_->Js.Undefined.toOption) {
+      | Some(date) => date
+      | None => openDate
+      };
+    updateOpenDate(openDate);
+    updateCloseDate(closeDate);
+  | None => {
+      updateOpenDate(today);
+      updateCloseDate(today);
+    }
+  };
 })}
 />
 ```
