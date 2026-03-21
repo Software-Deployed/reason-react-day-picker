@@ -1,45 +1,75 @@
-type captionLayout =
-  | Label
-  | Dropdown
-  | DropdownMonths
-  | DropdownYears;
+type mode = [
+  | `Single
+  | `Multiple
+  | `Range
+];
+
+let modeToString = (v: mode): string =>
+  switch (v) {
+  | `Single => "single"
+  | `Multiple => "multiple"
+  | `Range => "range"
+  };
+
+type captionLayout = [
+  | `Label
+  | `Dropdown
+  | `DropdownMonths
+  | `DropdownYears
+];
 
 let captionLayoutToString = (v: captionLayout): string =>
   switch (v) {
-  | Label => "label"
-  | Dropdown => "dropdown"
-  | DropdownMonths => "dropdown-months"
-  | DropdownYears => "dropdown-years"
+  | `Label => "label"
+  | `Dropdown => "dropdown"
+  | `DropdownMonths => "dropdown-months"
+  | `DropdownYears => "dropdown-years"
   };
 
-type navLayout =
-  | Around
-  | After;
+type navLayout = [
+  | `Around
+  | `After
+];
 
 let navLayoutToString = (v: navLayout): string =>
   switch (v) {
-  | Around => "around"
-  | After => "after"
+  | `Around => "around"
+  | `After => "after"
   };
 
-/* `footer` can be a string or a React node. */
-type footer =
-  | FooterString(string)
-  | FooterNode(React.element);
+type reactNode = React.element;
+
+/* `reactNode` can be created with `React.string`, `React.int`, JSX, etc. */
 
 type singleDate = Js.Undefined.t(Js.Date.t);
 type multipleDate = Js.Undefined.t(array(Js.Date.t));
 type dateRange = {
   from: singleDate,
-  [@mel.as "to"]
-  to_: singleDate,
+  [@mel.as "to"] to_: singleDate,
 };
 type rangeDate = Js.Undefined.t(dateRange);
+
+type selected = [
+  | `Single(singleDate)
+  | `Multiple(multipleDate)
+  | `Range(rangeDate)
+];
+
+type onSelect = [
+  | `Single(singleDate => unit)
+  | `Multiple(multipleDate => unit)
+  | `Range(rangeDate => unit)
+];
 
 [@mel.obj]
 external makeProps:
   (
-    ~mode: 'mode,
+    ~mode:
+      [@mel.string] [
+        | [@mel.as "single"] `Single
+        | [@mel.as "multiple"] `Multiple
+        | [@mel.as "range"] `Range
+      ],
     ~onSelect:
       [@mel.unwrap] [
         | `Single(singleDate => unit)
@@ -52,42 +82,52 @@ external makeProps:
         | `Multiple(multipleDate)
         | `Range(rangeDate)
       ],
-    ~captionLayout: 'captionLayout=?,
-    ~reverseYears: 'reverseYears=?,
-    ~navLayout: 'navLayout=?,
-    ~disableNavigation: 'disableNavigation=?,
-    ~hideNavigation: 'hideNavigation=?,
-    ~animate: 'animate=?,
-    ~fixedWeeks: 'fixedWeeks=?,
-    ~footer: 'footer=?,
-    ~hideWeekdays: 'hideWeedays=?,
-    ~numberOfMonths: 'numberOfMonths=?,
-    ~reverseMonths: 'reverseMonths=?,
-    ~pagatedNavigation: 'pagedNavigation=?,
-    ~showOutsideDays: 'showOutsideDays=?,
-    ~showWeekNumber: 'showWeekNumber=?,
+    ~captionLayout:
+      [@mel.string] [
+        | [@mel.as "label"] `Label
+        | [@mel.as "dropdown"] `Dropdown
+        | [@mel.as "dropdown-months"] `DropdownMonths
+        | [@mel.as "dropdown-years"] `DropdownYears
+      ]=?,
+    ~reverseYears: bool=?,
+    ~navLayout:
+      [@mel.string] [
+        | [@mel.as "around"] `Around
+        | [@mel.as "after"] `After
+      ]=?,
+    ~disableNavigation: bool=?,
+    ~hideNavigation: bool=?,
+    ~animate: bool=?,
+    ~fixedWeeks: bool=?,
+    ~footer: reactNode=?,
+    ~hideWeekdays: bool=?,
+    ~numberOfMonths: int=?,
+    ~reverseMonths: bool=?,
+    ~pagedNavigation: bool=?,
+    ~showOutsideDays: bool=?,
+    ~showWeekNumber: bool=?,
     ~key: string=?,
     unit
   ) =>
   {
     .
-    "mode": 'mode,
+    "mode": string,
     "selected": 'selected,
     "onSelect": 'onSelect,
-    "captionLayout": 'captionLayout,
-    "reverseYears": 'reverseYears,
-    "navLayout": 'navLayout,
-    "disableNavigation": 'disableNavigation,
-    "hideNavigation": 'hideNavigation,
-    "animate": 'animate,
-    "fixedWeeks": 'fixedWeeks,
-    "footer": 'footer,
-    "hideWeekdays": 'hideWeekdays,
-    "numberOfMonths": 'numberOfMonths,
-    "reverseMonths": 'reverseMonths,
-    "pagedNavigation": 'pagedNavigation,
-    "showOutsideDays": 'showOutsideDays,
-    "showWeekNumber": 'showWeekNumber,
+    "captionLayout": string,
+    "reverseYears": bool,
+    "navLayout": string,
+    "disableNavigation": bool,
+    "hideNavigation": bool,
+    "animate": bool,
+    "fixedWeeks": bool,
+    "footer": reactNode,
+    "hideWeekdays": bool,
+    "numberOfMonths": int,
+    "reverseMonths": bool,
+    "pagedNavigation": bool,
+    "showOutsideDays": bool,
+    "showWeekNumber": bool,
   };
 
 [@mel.module "react-day-picker"]
@@ -97,13 +137,13 @@ external make:
     "mode": string,
     "onSelect": 'onSelect,
     "selected": 'selected,
-    "captionLayout": captionLayout,
-    "navLayout": navLayout,
+    "captionLayout": string,
+    "navLayout": string,
     "disableNavigation": bool,
     "hideNavigation": bool,
     "animate": bool,
     "fixedWeeks": bool,
-    "footer": footer,
+    "footer": reactNode,
     "hideWeekdays": bool,
     "numberOfMonths": int,
     "reverseMonths": bool,
