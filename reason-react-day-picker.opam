@@ -37,3 +37,6 @@ build: [
 dev-repo:
   "git+https://github.com/Software-Deployed/reason-react-day-picker.git"
 x-maintenance-intent: ["(latest)"]
+pin-depends: [
+  [ "server-reason-react" "git+https://github.com/ml-in-barcelona/server-reason-react.git" ]
+]

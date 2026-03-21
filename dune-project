@@ -31,4 +31,9 @@
  (tags
   ("melange" "reason" "bindings" "react-day-picker" "react")))
 
+(pin
+ (url "git+https://github.com/ml-in-barcelona/server-reason-react.git")
+ (package
+  (name server-reason-react)))
+
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

@@ -3,13 +3,14 @@ open SharedFixture;
 let config = Scenario.current();
 
 let demoDate =
-  Js.Date.makeWithYMDHMS(
+  Js.Date.make(
     ~year=float_of_int(demoYear),
     ~month=float_of_int(demoMonth),
     ~date=float_of_int(demoDay),
     ~hours=12.0,
     ~minutes=0.0,
     ~seconds=0.0,
+    (),
   );
 
 let footer =

@@ -20,9 +20,9 @@ Add `reason-react-day-picker` to `libraries` dune stanza:
 
 The native version is optional and only builds when `server-reason-react` is installed.
 
-1. Install server-reason-react:
+1. Pin and install `server-reason-react` from git:
 ```bash
-opam install server-reason-react
+opam pin add server-reason-react git+https://github.com/ml-in-barcelona/server-reason-react.git
 ```
 
 2. Add `reason-react-day-picker.native` to your libraries:

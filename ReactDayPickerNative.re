@@ -139,28 +139,45 @@ type calendarWeek = {
   weekNumber: int,
 };
 
-let dateYear = (date: Js.Date.t): int => int_of_float(Js.Date.getFullYear(date));
-let dateMonth = (date: Js.Date.t): int => int_of_float(Js.Date.getMonth(date));
+let dateYear = (date: Js.Date.t): int =>
+  int_of_float(Js.Date.getFullYear(date));
+let dateMonth = (date: Js.Date.t): int =>
+  int_of_float(Js.Date.getMonth(date));
 let dateDay = (date: Js.Date.t): int => int_of_float(Js.Date.getDate(date));
-let dayOfWeek = (date: Js.Date.t): int => int_of_float(Js.Date.getDay(date));
+let dayOfWeek = (date: Js.Date.t): int =>
+  int_of_float(Js.Date.getDay(date));
 
-let monthNames = [|"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"|];
+let monthNames = [|
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+|];
 
 let getMonthName = (index: int): string =>
   if (index >= 0 && index < Array.length(monthNames)) {
-    Array.get(monthNames, index);
+    monthNames[index];
   } else {
     "";
   };
 
 let newDate = (~year: int, ~month: int, ~day: int): Js.Date.t => {
-  Js.Date.makeWithYMDHMS(
+  Js.Date.make(
     ~year=float_of_int(year),
     ~month=float_of_int(month),
     ~date=float_of_int(day),
     ~hours=12.,
     ~minutes=0.,
     ~seconds=0.,
+    (),
   );
 };
 
@@ -168,13 +185,18 @@ let setMonth = (date: Js.Date.t, month: int): Js.Date.t => {
   newDate(~year=dateYear(date), ~month, ~day=dateDay(date));
 };
 
-let startOfMonth = (date: Js.Date.t): Js.Date.t => newDate(~year=dateYear(date), ~month=dateMonth(date), ~day=1);
+let startOfMonth = (date: Js.Date.t): Js.Date.t =>
+  newDate(~year=dateYear(date), ~month=dateMonth(date), ~day=1);
 
-let isBefore = (a: Js.Date.t, b: Js.Date.t): bool => Js.Date.getTime(a) < Js.Date.getTime(b);
-let isAfter = (a: Js.Date.t, b: Js.Date.t): bool => Js.Date.getTime(a) > Js.Date.getTime(b);
+let isBefore = (a: Js.Date.t, b: Js.Date.t): bool =>
+  Js.Date.getTime(a) < Js.Date.getTime(b);
+let isAfter = (a: Js.Date.t, b: Js.Date.t): bool =>
+  Js.Date.getTime(a) > Js.Date.getTime(b);
 
 let isSameDay = (a: Js.Date.t, b: Js.Date.t): bool => {
-  dateYear(a) == dateYear(b) && dateMonth(a) == dateMonth(b) && dateDay(a) == dateDay(b);
+  dateYear(a) == dateYear(b)
+  && dateMonth(a) == dateMonth(b)
+  && dateDay(a) == dateDay(b);
 };
 
 let daysInMonth = (year: int, month: int): int => {
@@ -203,7 +225,7 @@ let daysInMonth = (year: int, month: int): int => {
 let formatMonthYear = (date: Js.Date.t): string => {
   let monthName =
     if (dateMonth(date) >= 0 && dateMonth(date) < Array.length(monthNames)) {
-      Some(Array.get(monthNames, dateMonth(date)));
+      Some(monthNames[dateMonth(date)]);
     } else {
       None;
     };
@@ -213,35 +235,59 @@ let formatMonthYear = (date: Js.Date.t): string => {
   };
 };
 
-let formatDayNumber = (date: Js.Date.t): string => string_of_int(dateDay(date));
+let formatDayNumber = (date: Js.Date.t): string =>
+  string_of_int(dateDay(date));
 
 let formatISODate = (date: Js.Date.t): string => {
   let y = dateYear(date);
   let m = dateMonth(date) + 1;
   let d = dateDay(date);
-  let mm = if (m < 10) { "0" ++ string_of_int(m) } else { string_of_int(m) };
-  let dd = if (d < 10) { "0" ++ string_of_int(d) } else { string_of_int(d) };
+  let mm =
+    if (m < 10) {
+      "0" ++ string_of_int(m);
+    } else {
+      string_of_int(m);
+    };
+  let dd =
+    if (d < 10) {
+      "0" ++ string_of_int(d);
+    } else {
+      string_of_int(d);
+    };
   string_of_int(y) ++ "-" ++ mm ++ "-" ++ dd;
 };
 
 let formatYearMonth = (date: Js.Date.t): string => {
   let y = dateYear(date);
   let m = dateMonth(date) + 1;
-  let mm = if (m < 10) { "0" ++ string_of_int(m) } else { string_of_int(m) };
+  let mm =
+    if (m < 10) {
+      "0" ++ string_of_int(m);
+    } else {
+      string_of_int(m);
+    };
   string_of_int(y) ++ "-" ++ mm;
 };
 
 let weekdayShort = [|"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"|];
-let weekdayLabel = [|"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"|];
+let weekdayLabel = [|
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+|];
 let getWeekdayName = (index: int): string =>
   if (index >= 0 && index < Array.length(weekdayLabel)) {
-    Array.get(weekdayLabel, index);
+    weekdayLabel[index];
   } else {
     "";
   };
 let getWeekdayShort = (index: int): string =>
   if (index >= 0 && index < Array.length(weekdayShort)) {
-    Array.get(weekdayShort, index);
+    weekdayShort[index];
   } else {
     "";
   };
@@ -261,10 +307,12 @@ let getWeekNumber = (date: Js.Date.t): int => {
   let yearVal = dateYear(date);
   let firstOfYear = newDate(~year=yearVal, ~month=0, ~day=1);
   let firstWeekday = dayOfWeek(firstOfYear);
-  ((getDayOfYear(date) - 1 + firstWeekday) / 7) + 1;
+  (getDayOfYear(date) - 1 + firstWeekday) / 7 + 1;
 };
 
-let buildMonthWeeks = (monthDate: Js.Date.t, ~weekStartsOn: int=0, ~fixedWeeks: bool=false, ()): array(calendarWeek) => {
+let buildMonthWeeks =
+    (monthDate: Js.Date.t, ~weekStartsOn: int=0, ~fixedWeeks: bool=false, ())
+    : array(calendarWeek) => {
   let yearVal = dateYear(monthDate);
   let monthVal = dateMonth(monthDate);
   let firstDayOfMonth = newDate(~year=yearVal, ~month=monthVal, ~day=1);
@@ -277,13 +325,23 @@ let buildMonthWeeks = (monthDate: Js.Date.t, ~weekStartsOn: int=0, ~fixedWeeks: 
       (firstDayWeekday + lastDay + 6) / 7;
     };
 
-  let prevMonth = if (monthVal == 0) { 11 } else { monthVal - 1 };
-  let prevYear = if (monthVal == 0) { yearVal - 1 } else { yearVal };
+  let prevMonth =
+    if (monthVal == 0) {
+      11;
+    } else {
+      monthVal - 1;
+    };
+  let prevYear =
+    if (monthVal == 0) {
+      yearVal - 1;
+    } else {
+      yearVal;
+    };
   let prevMonthDays = daysInMonth(prevYear, prevMonth);
 
-   let weeks = ref([]);
-   let dayCounter = ref(1);
-   let nextMonthDay = ref(1);
+  let weeks = ref([]);
+  let dayCounter = ref(1);
+  let nextMonthDay = ref(1);
 
   for (weekIndex in 0 to totalWeeks - 1) {
     let weekDays = ref([]);
@@ -291,19 +349,40 @@ let buildMonthWeeks = (monthDate: Js.Date.t, ~weekStartsOn: int=0, ~fixedWeeks: 
       let dayInfo =
         if (weekIndex == 0 && dayIndex < firstDayWeekday) {
           let prevDay = prevMonthDays - firstDayWeekday + dayIndex + 1;
-          {date: newDate(~year=prevYear, ~month=prevMonth, ~day=prevDay), isOutside: true};
+          {
+            date: newDate(~year=prevYear, ~month=prevMonth, ~day=prevDay),
+            isOutside: true,
+          };
         } else if (dayCounter^ > lastDay) {
-          let nextMonth = if (monthVal == 11) { 0 } else { monthVal + 1 };
-          let nextYear = if (monthVal == 11) { yearVal + 1 } else { yearVal };
-          let dayObj = newDate(~year=nextYear, ~month=nextMonth, ~day=nextMonthDay^);
+          let nextMonth =
+            if (monthVal == 11) {
+              0;
+            } else {
+              monthVal + 1;
+            };
+          let nextYear =
+            if (monthVal == 11) {
+              yearVal + 1;
+            } else {
+              yearVal;
+            };
+          let dayObj =
+            newDate(~year=nextYear, ~month=nextMonth, ~day=nextMonthDay^);
           nextMonthDay := nextMonthDay^ + 1;
-          {date: dayObj, isOutside: true};
+          {
+            date: dayObj,
+            isOutside: true,
+          };
         } else {
-          let dayObj = newDate(~year=yearVal, ~month=monthVal, ~day=dayCounter^);
+          let dayObj =
+            newDate(~year=yearVal, ~month=monthVal, ~day=dayCounter^);
           dayCounter := dayCounter^ + 1;
-          {date: dayObj, isOutside: false};
+          {
+            date: dayObj,
+            isOutside: false,
+          };
         };
-        weekDays := [dayInfo, ...weekDays^];
+      weekDays := [dayInfo, ...weekDays^];
     };
 
     let reversedWeekDays = List.rev(weekDays^);
@@ -311,11 +390,21 @@ let buildMonthWeeks = (monthDate: Js.Date.t, ~weekStartsOn: int=0, ~fixedWeeks: 
     let firstDate =
       switch (reversedWeekDays) {
       | [value, ..._] => value
-      | [] => {date: newDate(~year=yearVal, ~month=monthVal, ~day=1), isOutside: false}
+      | [] => {
+          date: newDate(~year=yearVal, ~month=monthVal, ~day=1),
+          isOutside: false,
+        }
       };
     let weekNum = getWeekNumber(firstDate.date);
 
-    weeks := [{days: weekDaysArray, weekNumber: weekNum}, ...weeks^];
+    weeks :=
+      [
+        {
+          days: weekDaysArray,
+          weekNumber: weekNum,
+        },
+        ...weeks^,
+      ];
   };
 
   Array.of_list(List.rev(weeks^));
@@ -331,16 +420,20 @@ let isDateSelected = (date: Js.Date.t, selected: option(selected)): bool => {
     }
   | Some(`Multiple(optionDates)) =>
     switch (Js.Undefined.toOption(optionDates)) {
-    | Some(values) => values |> Array.exists((value) => isSameDay(date, value))
+    | Some(values) => values |> Array.exists(value => isSameDay(date, value))
     | None => false
     }
   | Some(`Range(optionRange)) =>
     switch (Js.Undefined.toOption(optionRange)) {
     | None => false
     | Some(rangeValue) =>
-      switch (Js.Undefined.toOption(rangeValue.from), Js.Undefined.toOption(rangeValue.to_)) {
+      switch (
+        Js.Undefined.toOption(rangeValue.from),
+        Js.Undefined.toOption(rangeValue.to_),
+      ) {
       | (Some(from), Some(to_)) =>
-        (isAfter(date, from) || isSameDay(date, from)) && (isBefore(date, to_) || isSameDay(date, to_))
+        (isAfter(date, from) || isSameDay(date, from))
+        && (isBefore(date, to_) || isSameDay(date, to_))
       | (Some(from), None) => isSameDay(date, from)
       | (None, Some(to_)) => isSameDay(date, to_)
       | (None, None) => false
@@ -355,7 +448,8 @@ type rangePosition =
   | RangeMiddle
   | RangeEnd;
 
-let getRangePosition = (date: Js.Date.t, selected: option(selected)): rangePosition => {
+let getRangePosition =
+    (date: Js.Date.t, selected: option(selected)): rangePosition => {
   switch (selected) {
   | Some(`Range(optionRange)) =>
     switch (Js.Undefined.toOption(optionRange)) {
@@ -375,7 +469,10 @@ let getRangePosition = (date: Js.Date.t, selected: option(selected)): rangePosit
       } else if (isEnd) {
         RangeEnd;
       } else {
-        switch (Js.Undefined.toOption(rangeValue.from), Js.Undefined.toOption(rangeValue.to_)) {
+        switch (
+          Js.Undefined.toOption(rangeValue.from),
+          Js.Undefined.toOption(rangeValue.to_),
+        ) {
         | (Some(start), Some(stop)) =>
           if (isAfter(date, start) && isBefore(date, stop)) {
             RangeMiddle;
@@ -384,7 +481,7 @@ let getRangePosition = (date: Js.Date.t, selected: option(selected)): rangePosit
           }
         | _ => NoRange
         };
-      }
+      };
     | None => NoRange
     }
   | _ => NoRange
@@ -393,7 +490,12 @@ let getRangePosition = (date: Js.Date.t, selected: option(selected)): rangePosit
 
 let joinClassList = (values: array(string)): string => {
   Array.fold_left(
-    (acc, value) => if (String.length(acc) == 0) { value } else { acc ++ " " ++ value },
+    (acc, value) =>
+      if (String.length(acc) == 0) {
+        value;
+      } else {
+        acc ++ " " ++ value;
+      },
     "",
     values,
   );
@@ -414,11 +516,26 @@ let ordinalSuffix = (day: int): string => {
 };
 
 let formatAriaDayLabel = (date: Js.Date.t, ~isToday: bool): string => {
-  let prefix = if (isToday) { "Today, " } else { "" };
-  prefix ++ getWeekdayName(dayOfWeek(date)) ++ ", " ++ getMonthName(dateMonth(date)) ++ " " ++ string_of_int(dateDay(date)) ++ ordinalSuffix(dateDay(date)) ++ ", " ++ string_of_int(dateYear(date));
+  let prefix = if (isToday) {"Today, "} else {""};
+  prefix
+  ++ getWeekdayName(dayOfWeek(date))
+  ++ ", "
+  ++ getMonthName(dateMonth(date))
+  ++ " "
+  ++ string_of_int(dateDay(date))
+  ++ ordinalSuffix(dateDay(date))
+  ++ ", "
+  ++ string_of_int(dateYear(date));
 };
 
-let getDayClasses = (day: calendarDay, selected: option(selected), today: Js.Date.t, showOutsideDays: bool): string => {
+let getDayClasses =
+    (
+      day: calendarDay,
+      selected: option(selected),
+      today: Js.Date.t,
+      showOutsideDays: bool,
+    )
+    : string => {
   let modifiers = ref([]);
   if (isSameDay(day.date, today)) {
     modifiers := List.concat([modifiers^, [classNames.dayToday]]);
@@ -433,9 +550,12 @@ let getDayClasses = (day: calendarDay, selected: option(selected), today: Js.Dat
     modifiers := List.concat([modifiers^, [classNames.dayOutside]]);
   };
   switch (getRangePosition(day.date, selected)) {
-  | RangeStart => modifiers := List.concat([modifiers^, [classNames.dayRangeStart]])
-  | RangeMiddle => modifiers := List.concat([modifiers^, [classNames.dayRangeMiddle]])
-  | RangeEnd => modifiers := List.concat([modifiers^, [classNames.dayRangeEnd]])
+  | RangeStart =>
+    modifiers := List.concat([modifiers^, [classNames.dayRangeStart]])
+  | RangeMiddle =>
+    modifiers := List.concat([modifiers^, [classNames.dayRangeMiddle]])
+  | RangeEnd =>
+    modifiers := List.concat([modifiers^, [classNames.dayRangeEnd]])
   | NoRange => ()
   };
 
@@ -448,15 +568,25 @@ let getDayClasses = (day: calendarDay, selected: option(selected), today: Js.Dat
   };
 };
 
-let stringProp = (name: string, jsxName: string, value: string): React.JSX.prop => React.JSX.string(name, jsxName, value);
-let intProp = (name: string, jsxName: string, value: int): React.JSX.prop => React.JSX.int(name, jsxName, value);
-let boolProp = (name: string, jsxName: string, value: bool): React.JSX.prop => React.JSX.bool(name, jsxName, value);
-let styleProp = (value: list((string, string, string))): React.JSX.prop => React.JSX.style(value);
-let classNameProp = (value: string): React.JSX.prop => React.JSX.string("class", "className", value);
-let roleProp = (value: string): React.JSX.prop => React.JSX.string("role", "role", value);
-let scopeProp = (value: string): React.JSX.prop => React.JSX.string("scope", "scope", value);
-let ariaLabelProp = (value: string): React.JSX.prop => stringProp("aria-label", "ariaLabel", value);
-let ariaHiddenProp = (value: string): React.JSX.prop => stringProp("aria-hidden", "ariaHidden", value);
+let stringProp =
+    (name: string, jsxName: string, value: string): React.JSX.prop =>
+  React.JSX.string(name, jsxName, value);
+let intProp = (name: string, jsxName: string, value: int): React.JSX.prop =>
+  React.JSX.int(name, jsxName, value);
+let boolProp = (name: string, jsxName: string, value: bool): React.JSX.prop =>
+  React.JSX.bool(name, jsxName, value);
+let styleProp = (value: list((string, string, string))): React.JSX.prop =>
+  React.JSX.style(value);
+let classNameProp = (value: string): React.JSX.prop =>
+  React.JSX.string("class", "className", value);
+let roleProp = (value: string): React.JSX.prop =>
+  React.JSX.string("role", "role", value);
+let scopeProp = (value: string): React.JSX.prop =>
+  React.JSX.string("scope", "scope", value);
+let ariaLabelProp = (value: string): React.JSX.prop =>
+  stringProp("aria-label", "ariaLabel", value);
+let ariaHiddenProp = (value: string): React.JSX.prop =>
+  stringProp("aria-hidden", "ariaHidden", value);
 
 let element = (~key=?, ~props=[], tag, children) =>
   React.createElementWithKey(~key?, tag, props, children);
@@ -464,67 +594,110 @@ let element = (~key=?, ~props=[], tag, children) =>
 let renderCaptionChevron = () =>
   element(
     "svg",
-    ~props=[classNameProp(classNames.chevron), intProp("width", "width", 18), intProp("height", "height", 18), stringProp("viewBox", "viewBox", "0 0 24 24")],
-    [element("polygon", ~props=[stringProp("points", "points", "6.77 8 12.5 13.57 18.24 8 20 9.72 12.5 17 5 9.72")], [])],
+    ~props=[
+      classNameProp(classNames.chevron),
+      intProp("width", "width", 18),
+      intProp("height", "height", 18),
+      stringProp("viewBox", "viewBox", "0 0 24 24"),
+    ],
+    [
+      element(
+        "polygon",
+        ~props=[
+          stringProp(
+            "points",
+            "points",
+            "6.77 8 12.5 13.57 18.24 8 20 9.72 12.5 17 5 9.72",
+          ),
+        ],
+        [],
+      ),
+    ],
   );
 
-let renderMonthOption = (monthIndex: int, selectedMonth: int) =>
-  {
+let renderMonthOption = (monthIndex: int, selectedMonth: int) => {
   let props =
     List.concat([
       [stringProp("value", "value", string_of_int(monthIndex))],
-      monthIndex == selectedMonth ? [stringProp("selected", "selected", "")] : [],
+      monthIndex == selectedMonth
+        ? [stringProp("selected", "selected", "")] : [],
     ]);
-  element(
-    "option",
-    ~props,
-    [React.string(getMonthName(monthIndex))],
-  );
-  };
+  element("option", ~props, [React.string(getMonthName(monthIndex))]);
+};
 
-let renderYearOption = (yearValue: int, selectedYear: int) =>
-  {
+let renderYearOption = (yearValue: int, selectedYear: int) => {
   let props =
     List.concat([
       [stringProp("value", "value", string_of_int(yearValue))],
-      yearValue == selectedYear ? [stringProp("selected", "selected", "")] : [],
+      yearValue == selectedYear
+        ? [stringProp("selected", "selected", "")] : [],
     ]);
-  element(
-    "option",
-    ~props,
-    [React.string(string_of_int(yearValue))],
-  );
-  };
+  element("option", ~props, [React.string(string_of_int(yearValue))]);
+};
 
-let renderDropdownRoot = (~disabled: bool, ~selectClassName: string, ~ariaLabel: string, ~selectChildren: array(React.element), ~displayLabel: string) =>
+let renderDropdownRoot =
+    (
+      ~disabled: bool,
+      ~selectClassName: string,
+      ~ariaLabel: string,
+      ~selectChildren: array(React.element),
+      ~displayLabel: string,
+    ) =>
   element(
     "span",
-    ~props=[stringProp("data-disabled", "dataDisabled", disabled ? "true" : "false"), classNameProp(classNames.dropdownRoot)],
+    ~props=[
+      stringProp(
+        "data-disabled",
+        "dataDisabled",
+        disabled ? "true" : "false",
+      ),
+      classNameProp(classNames.dropdownRoot),
+    ],
     [
       element(
         "select",
-        ~props=List.concat([[classNameProp(selectClassName), ariaLabelProp(ariaLabel)], disabled ? [boolProp("disabled", "disabled", true)] : []]),
+        ~props=
+          List.concat([
+            [classNameProp(selectClassName), ariaLabelProp(ariaLabel)],
+            disabled ? [boolProp("disabled", "disabled", true)] : [],
+          ]),
         [React.array(selectChildren)],
       ),
       element(
         "span",
-        ~props=[classNameProp(classNames.captionLabel), ariaHiddenProp("true")],
+        ~props=[
+          classNameProp(classNames.captionLabel),
+          ariaHiddenProp("true"),
+        ],
         [React.string(displayLabel), renderCaptionChevron()],
       ),
     ],
   );
 
-let renderCaptionDropdowns = (~captionLayout: captionLayout, ~monthDate: Js.Date.t, ~navigationDisabled: bool, ~todayYear: int, ~reverseYears: bool) => {
+let renderCaptionDropdowns =
+    (
+      ~captionLayout: captionLayout,
+      ~monthDate: Js.Date.t,
+      ~navigationDisabled: bool,
+      ~todayYear: int,
+      ~reverseYears: bool,
+    ) => {
   let selectedMonth = dateMonth(monthDate);
   let selectedYear = dateYear(monthDate);
-  let monthOptions = Array.init(12, (monthIndex) => renderMonthOption(monthIndex, selectedMonth));
+  let monthOptions =
+    Array.init(12, monthIndex =>
+      renderMonthOption(monthIndex, selectedMonth)
+    );
   let startYear = todayYear - 100;
   let yearCount = todayYear - startYear + 1;
   let yearOptions =
-    Array.init(yearCount, (index) => {
-      let yearValue = reverseYears ? todayYear - index : startYear + index;
-      renderYearOption(yearValue, selectedYear);
-    });
+    Array.init(
+      yearCount,
+      index => {
+        let yearValue = reverseYears ? todayYear - index : startYear + index;
+        renderYearOption(yearValue, selectedYear);
+      },
+    );
 
   let liveRegion =
     element(
@@ -556,14 +729,16 @@ let renderCaptionDropdowns = (~captionLayout: captionLayout, ~monthDate: Js.Date
       [
         renderDropdownRoot(
           ~disabled=navigationDisabled,
-          ~selectClassName=classNames.dropdown ++ " " ++ classNames.monthsDropdown,
+          ~selectClassName=
+            classNames.dropdown ++ " " ++ classNames.monthsDropdown,
           ~ariaLabel="Choose the Month",
           ~selectChildren=monthOptions,
           ~displayLabel=getMonthName(selectedMonth),
         ),
         renderDropdownRoot(
           ~disabled=navigationDisabled,
-          ~selectClassName=classNames.dropdown ++ " " ++ classNames.yearsDropdown,
+          ~selectClassName=
+            classNames.dropdown ++ " " ++ classNames.yearsDropdown,
           ~ariaLabel="Choose the Year",
           ~selectChildren=yearOptions,
           ~displayLabel=string_of_int(selectedYear),
@@ -578,7 +753,8 @@ let renderCaptionDropdowns = (~captionLayout: captionLayout, ~monthDate: Js.Date
       [
         renderDropdownRoot(
           ~disabled=navigationDisabled,
-          ~selectClassName=classNames.dropdown ++ " " ++ classNames.monthsDropdown,
+          ~selectClassName=
+            classNames.dropdown ++ " " ++ classNames.monthsDropdown,
           ~ariaLabel="Choose the Month",
           ~selectChildren=monthOptions,
           ~displayLabel=getMonthName(selectedMonth),
@@ -595,7 +771,8 @@ let renderCaptionDropdowns = (~captionLayout: captionLayout, ~monthDate: Js.Date
         element("span", [React.string(getMonthName(selectedMonth))]),
         renderDropdownRoot(
           ~disabled=navigationDisabled,
-          ~selectClassName=classNames.dropdown ++ " " ++ classNames.yearsDropdown,
+          ~selectClassName=
+            classNames.dropdown ++ " " ++ classNames.yearsDropdown,
           ~ariaLabel="Choose the Year",
           ~selectChildren=yearOptions,
           ~displayLabel=string_of_int(selectedYear),
@@ -609,10 +786,14 @@ let renderCaptionDropdowns = (~captionLayout: captionLayout, ~monthDate: Js.Date
 
 let renderWeekdayHeader = (showWeekNum: bool, ~animate: bool) => {
   let weekdayCells =
-    Array.init(7, (dayIndex) =>
+    Array.init(7, dayIndex =>
       element(
         "th",
-        ~props=[ariaLabelProp(getWeekdayName(dayIndex)), classNameProp(classNames.weekday), scopeProp("col")],
+        ~props=[
+          ariaLabelProp(getWeekdayName(dayIndex)),
+          classNameProp(classNames.weekday),
+          scopeProp("col"),
+        ],
         [React.string(getWeekdayShort(dayIndex))],
       )
     );
@@ -621,7 +802,11 @@ let renderWeekdayHeader = (showWeekNum: bool, ~animate: bool) => {
     if (showWeekNum) {
       element(
         "th",
-        ~props=[ariaLabelProp("Week Number"), classNameProp(classNames.weekNumberHeader), scopeProp("col")],
+        ~props=[
+          ariaLabelProp("Week Number"),
+          classNameProp(classNames.weekNumberHeader),
+          scopeProp("col"),
+        ],
         [React.string("")],
       );
     } else {
@@ -636,7 +821,14 @@ let renderWeekdayHeader = (showWeekNum: bool, ~animate: bool) => {
         "tr",
         ~props=
           animate
-            ? [stringProp("data-animated-weekdays", "dataAnimatedWeekdays", "true"), classNameProp(classNames.weekdays)]
+            ? [
+              stringProp(
+                "data-animated-weekdays",
+                "dataAnimatedWeekdays",
+                "true",
+              ),
+              classNameProp(classNames.weekdays),
+            ]
             : [classNameProp(classNames.weekdays)],
         [weekNumberHeader, React.array(weekdayCells)],
       ),
@@ -644,12 +836,24 @@ let renderWeekdayHeader = (showWeekNum: bool, ~animate: bool) => {
   );
 };
 
-let renderWeekRow = (week: calendarWeek, ~showWeekNum: bool, selected: option(selected), today: Js.Date.t, showOutsideDays: bool) => {
+let renderWeekRow =
+    (
+      week: calendarWeek,
+      ~showWeekNum: bool,
+      selected: option(selected),
+      today: Js.Date.t,
+      showOutsideDays: bool,
+    ) => {
   let weekNumberCell =
     if (showWeekNum) {
       element(
         "th",
-        ~props=[ariaLabelProp("Week " ++ string_of_int(week.weekNumber)), classNameProp(classNames.weekNumber), scopeProp("row"), roleProp("rowheader")],
+        ~props=[
+          ariaLabelProp("Week " ++ string_of_int(week.weekNumber)),
+          classNameProp(classNames.weekNumber),
+          scopeProp("row"),
+          roleProp("rowheader"),
+        ],
         [React.string(string_of_int(week.weekNumber))],
       );
     } else {
@@ -659,179 +863,307 @@ let renderWeekRow = (week: calendarWeek, ~showWeekNum: bool, selected: option(se
   let dayCells =
     week.days
     |> Array.map((day: calendarDay) => {
-      let cellClassName = getDayClasses(day, selected, today, showOutsideDays);
-      let dayIsToday = isSameDay(day.date, today);
-      let hasContent = showOutsideDays || !day.isOutside;
-      let tdProps = ref([classNameProp(cellClassName), roleProp("gridcell"), stringProp("data-day", "dataDay", formatISODate(day.date))]);
-      if (day.isOutside) {
-        tdProps :=
-          List.concat([
-            tdProps^,
-            showOutsideDays
-              ? [stringProp("data-month", "dataMonth", formatYearMonth(day.date)), stringProp("data-outside", "dataOutside", "true")]
-              : [
-                  stringProp("data-month", "dataMonth", formatYearMonth(day.date)),
-                  stringProp("data-hidden", "dataHidden", "true"),
-                  stringProp("data-outside", "dataOutside", "true"),
-                ],
-          ]);
-      };
-      if (dayIsToday) {
-        tdProps := List.concat([tdProps^, [stringProp("data-today", "dataToday", "true")]]);
-      };
+         let cellClassName =
+           getDayClasses(day, selected, today, showOutsideDays);
+         let dayIsToday = isSameDay(day.date, today);
+         let hasContent = showOutsideDays || !day.isOutside;
+         let tdProps =
+           ref([
+             classNameProp(cellClassName),
+             roleProp("gridcell"),
+             stringProp("data-day", "dataDay", formatISODate(day.date)),
+           ]);
+         if (day.isOutside) {
+           tdProps :=
+             List.concat([
+               tdProps^,
+               showOutsideDays
+                 ? [
+                   stringProp(
+                     "data-month",
+                     "dataMonth",
+                     formatYearMonth(day.date),
+                   ),
+                   stringProp("data-outside", "dataOutside", "true"),
+                 ]
+                 : [
+                   stringProp(
+                     "data-month",
+                     "dataMonth",
+                     formatYearMonth(day.date),
+                   ),
+                   stringProp("data-hidden", "dataHidden", "true"),
+                   stringProp("data-outside", "dataOutside", "true"),
+                 ],
+             ]);
+         };
+         if (dayIsToday) {
+           tdProps :=
+             List.concat([
+               tdProps^,
+               [stringProp("data-today", "dataToday", "true")],
+             ]);
+         };
 
-      let content =
-        if (hasContent) {
-          element(
-            "button",
-            ~props=[
-              classNameProp(classNames.dayButton),
-              stringProp("type", "type", "button"),
-              intProp("tabindex", "tabIndex", dayIsToday ? 0 : -1),
-              ariaLabelProp(formatAriaDayLabel(day.date, ~isToday=dayIsToday)),
-            ],
-            [React.string(formatDayNumber(day.date))],
-          );
-        } else {
-          React.string("");
-        };
+         let content =
+           if (hasContent) {
+             element(
+               "button",
+               ~props=[
+                 classNameProp(classNames.dayButton),
+                 stringProp("type", "type", "button"),
+                 intProp("tabindex", "tabIndex", dayIsToday ? 0 : (-1)),
+                 ariaLabelProp(
+                   formatAriaDayLabel(day.date, ~isToday=dayIsToday),
+                 ),
+               ],
+               [React.string(formatDayNumber(day.date))],
+             );
+           } else {
+             React.string("");
+           };
 
-      element("td", ~props=tdProps^, [content]);
-    });
+         element("td", ~props=tdProps^, [content]);
+       });
 
-  element("tr", ~props=[classNameProp(classNames.week)], [weekNumberCell, React.array(dayCells)]);
+  element(
+    "tr",
+    ~props=[classNameProp(classNames.week)],
+    [weekNumberCell, React.array(dayCells)],
+  );
 };
 
-let renderMonth = (
-  monthIndex: int,
-  ~showOutsideDays: bool,
-  ~showWeekNumber: bool,
-  ~hideWeekdays: bool,
-  ~fixedWeeks: bool,
-  ~captionLayout: option(captionLayout),
-  ~reverseYears: bool,
-  ~animate: bool,
-  ~navigationDisabled: bool,
-  ~embeddedNavigation: option(React.element),
-  ~todayYear: int,
-  today: Js.Date.t,
-  selected: option(selected),
-) => {
-  let monthStart = startOfMonth(today) |> setMonth(_, dateMonth(today) + monthIndex);
+let renderMonth =
+    (
+      monthIndex: int,
+      ~showOutsideDays: bool,
+      ~showWeekNumber: bool,
+      ~hideWeekdays: bool,
+      ~fixedWeeks: bool,
+      ~captionLayout: option(captionLayout),
+      ~reverseYears: bool,
+      ~animate: bool,
+      ~navigationDisabled: bool,
+      ~embeddedNavigation: option(React.element),
+      ~todayYear: int,
+      today: Js.Date.t,
+      selected: option(selected),
+    ) => {
+  let monthStart =
+    startOfMonth(today) |> setMonth(_, dateMonth(today) + monthIndex);
   let weeks = buildMonthWeeks(monthStart, ~weekStartsOn=0, ~fixedWeeks, ());
-  let weekdayHeader = hideWeekdays ? React.null : renderWeekdayHeader(showWeekNumber, ~animate);
+  let weekdayHeader =
+    hideWeekdays ? React.null : renderWeekdayHeader(showWeekNumber, ~animate);
   let weekRows =
     weeks
-    |> Array.map((week: calendarWeek) => renderWeekRow(week, ~showWeekNum=showWeekNumber, selected, today, showOutsideDays));
+    |> Array.map((week: calendarWeek) =>
+         renderWeekRow(
+           week,
+           ~showWeekNum=showWeekNumber,
+           selected,
+           today,
+           showOutsideDays,
+         )
+       );
 
   let captionContent =
     switch (captionLayout) {
     | Some(`Dropdown as layout)
     | Some(`DropdownMonths as layout)
     | Some(`DropdownYears as layout) =>
-      renderCaptionDropdowns(~captionLayout=layout, ~monthDate=monthStart, ~navigationDisabled, ~todayYear, ~reverseYears)
+      renderCaptionDropdowns(
+        ~captionLayout=layout,
+        ~monthDate=monthStart,
+        ~navigationDisabled,
+        ~todayYear,
+        ~reverseYears,
+      )
     | _ =>
       element(
         "span",
-        ~props=[classNameProp(classNames.captionLabel), roleProp("status"), stringProp("aria-live", "ariaLive", "polite")],
+        ~props=[
+          classNameProp(classNames.captionLabel),
+          roleProp("status"),
+          stringProp("aria-live", "ariaLive", "polite"),
+        ],
         [React.string(formatMonthYear(monthStart))],
       )
     };
 
   let captionProps =
     animate
-      ? [stringProp("data-animated-caption", "dataAnimatedCaption", "true"), classNameProp(classNames.monthCaption)]
+      ? [
+        stringProp("data-animated-caption", "dataAnimatedCaption", "true"),
+        classNameProp(classNames.monthCaption),
+      ]
       : [classNameProp(classNames.monthCaption)];
   let monthProps =
     animate
-      ? [stringProp("data-animated-month", "dataAnimatedMonth", "true"), classNameProp(classNames.month)]
+      ? [
+        stringProp("data-animated-month", "dataAnimatedMonth", "true"),
+        classNameProp(classNames.month),
+      ]
       : [classNameProp(classNames.month)];
   let weeksProps =
     animate
-      ? [stringProp("data-animated-weeks", "dataAnimatedWeeks", "true"), classNameProp(classNames.weeks)]
+      ? [
+        stringProp("data-animated-weeks", "dataAnimatedWeeks", "true"),
+        classNameProp(classNames.weeks),
+      ]
       : [classNameProp(classNames.weeks)];
   let monthChildren =
     switch (embeddedNavigation) {
-    | Some(navigation) =>
-      [
+    | Some(navigation) => [
         element("div", ~props=captionProps, [captionContent]),
         navigation,
         element(
           "table",
-          ~props=[roleProp("grid"), stringProp("aria-multiselectable", "ariaMultiselectable", "false"), ariaLabelProp(formatMonthYear(monthStart)), classNameProp(classNames.monthGrid)],
-          [weekdayHeader, element("tbody", ~props=weeksProps, [React.array(weekRows)])],
+          ~props=[
+            roleProp("grid"),
+            stringProp(
+              "aria-multiselectable",
+              "ariaMultiselectable",
+              "false",
+            ),
+            ariaLabelProp(formatMonthYear(monthStart)),
+            classNameProp(classNames.monthGrid),
+          ],
+          [
+            weekdayHeader,
+            element("tbody", ~props=weeksProps, [React.array(weekRows)]),
+          ],
         ),
       ]
-    | None =>
-      [
+    | None => [
         element("div", ~props=captionProps, [captionContent]),
         element(
           "table",
-          ~props=[roleProp("grid"), stringProp("aria-multiselectable", "ariaMultiselectable", "false"), ariaLabelProp(formatMonthYear(monthStart)), classNameProp(classNames.monthGrid)],
-          [weekdayHeader, element("tbody", ~props=weeksProps, [React.array(weekRows)])],
+          ~props=[
+            roleProp("grid"),
+            stringProp(
+              "aria-multiselectable",
+              "ariaMultiselectable",
+              "false",
+            ),
+            ariaLabelProp(formatMonthYear(monthStart)),
+            classNameProp(classNames.monthGrid),
+          ],
+          [
+            weekdayHeader,
+            element("tbody", ~props=weeksProps, [React.array(weekRows)]),
+          ],
         ),
       ]
     };
 
-  element("div", ~key=string_of_int(monthIndex), ~props=monthProps, monthChildren);
+  element(
+    "div",
+    ~key=string_of_int(monthIndex),
+    ~props=monthProps,
+    monthChildren,
+  );
 };
 
 let renderNavigation = (~animate: bool, ~navigationDisabled: bool) => {
   let chevron = (points: string) =>
     element(
       "svg",
-      ~props=[classNameProp(classNames.chevron), intProp("width", "width", 24), intProp("height", "height", 24), stringProp("viewBox", "viewBox", "0 0 24 24")],
-      [element("polygon", ~props=[stringProp("points", "points", points)], [])],
+      ~props=[
+        classNameProp(classNames.chevron),
+        intProp("width", "width", 24),
+        intProp("height", "height", 24),
+        stringProp("viewBox", "viewBox", "0 0 24 24"),
+      ],
+      [
+        element(
+          "polygon",
+          ~props=[stringProp("points", "points", points)],
+          [],
+        ),
+      ],
     );
 
   element(
     "nav",
     ~props=
       animate
-        ? [stringProp("data-animated-nav", "dataAnimatedNav", "true"), classNameProp(classNames.nav), ariaLabelProp("Navigation bar")]
+        ? [
+          stringProp("data-animated-nav", "dataAnimatedNav", "true"),
+          classNameProp(classNames.nav),
+          ariaLabelProp("Navigation bar"),
+        ]
         : [classNameProp(classNames.nav), ariaLabelProp("Navigation bar")],
     [
       element(
         "button",
         ~props=
           navigationDisabled
-            ? [stringProp("type", "type", "button"), classNameProp(classNames.buttonPrevious), intProp("tabindex", "tabIndex", -1), stringProp("aria-disabled", "ariaDisabled", "true"), ariaLabelProp("Go to the Previous Month")]
-            : [stringProp("type", "type", "button"), classNameProp(classNames.buttonPrevious), ariaLabelProp("Go to the Previous Month")],
-        [chevron("16 18.112 9.81111111 12 16 5.87733333 14.0888889 4 6 12 14.0888889 20")],
+            ? [
+              stringProp("type", "type", "button"),
+              classNameProp(classNames.buttonPrevious),
+              intProp("tabindex", "tabIndex", -1),
+              stringProp("aria-disabled", "ariaDisabled", "true"),
+              ariaLabelProp("Go to the Previous Month"),
+            ]
+            : [
+              stringProp("type", "type", "button"),
+              classNameProp(classNames.buttonPrevious),
+              ariaLabelProp("Go to the Previous Month"),
+            ],
+        [
+          chevron(
+            "16 18.112 9.81111111 12 16 5.87733333 14.0888889 4 6 12 14.0888889 20",
+          ),
+        ],
       ),
       element(
         "button",
         ~props=
           navigationDisabled
-            ? [stringProp("type", "type", "button"), classNameProp(classNames.buttonNext), intProp("tabindex", "tabIndex", -1), stringProp("aria-disabled", "ariaDisabled", "true"), ariaLabelProp("Go to the Next Month")]
-            : [stringProp("type", "type", "button"), classNameProp(classNames.buttonNext), ariaLabelProp("Go to the Next Month")],
-        [chevron("8 18.112 14.18888889 12 8 5.87733333 9.91111111 4 18 12 9.91111111 20")],
+            ? [
+              stringProp("type", "type", "button"),
+              classNameProp(classNames.buttonNext),
+              intProp("tabindex", "tabIndex", -1),
+              stringProp("aria-disabled", "ariaDisabled", "true"),
+              ariaLabelProp("Go to the Next Month"),
+            ]
+            : [
+              stringProp("type", "type", "button"),
+              classNameProp(classNames.buttonNext),
+              ariaLabelProp("Go to the Next Month"),
+            ],
+        [
+          chevron(
+            "8 18.112 14.18888889 12 8 5.87733333 9.91111111 4 18 12 9.91111111 20",
+          ),
+        ],
       ),
     ],
   );
 };
 
-let make = (
-  ~mode: option(mode)=?,
-  ~onSelect: option(onSelect)=?,
-  ~selected: option(selected)=?,
-  ~captionLayout: option(captionLayout)=?,
-  ~reverseYears: option(bool)=?,
-  ~navLayout: option(navLayout)=?,
-  ~disableNavigation: option(bool)=?,
-  ~hideNavigation: option(bool)=?,
-  ~animate: option(bool)=?,
-  ~fixedWeeks: option(bool)=?,
-  ~footer: option(reactNode)=?,
-  ~hideWeekdays: option(bool)=?,
-  ~numberOfMonths: option(int)=?,
-  ~reverseMonths: option(bool)=?,
-  ~pagedNavigation: option(bool)=?,
-  ~showOutsideDays: option(bool)=?,
-  ~showWeekNumber: option(bool)=?,
-  ~key: option(string)=?,
-  (),
-) => {
+let make =
+    (
+      ~mode: option(mode)=?,
+      ~onSelect: option(onSelect)=?,
+      ~selected: option(selected)=?,
+      ~captionLayout: option(captionLayout)=?,
+      ~reverseYears: option(bool)=?,
+      ~navLayout: option(navLayout)=?,
+      ~disableNavigation: option(bool)=?,
+      ~hideNavigation: option(bool)=?,
+      ~animate: option(bool)=?,
+      ~fixedWeeks: option(bool)=?,
+      ~footer: option(reactNode)=?,
+      ~hideWeekdays: option(bool)=?,
+      ~numberOfMonths: option(int)=?,
+      ~reverseMonths: option(bool)=?,
+      ~pagedNavigation: option(bool)=?,
+      ~showOutsideDays: option(bool)=?,
+      ~showWeekNumber: option(bool)=?,
+      ~key: option(string)=?,
+      (),
+    ) => {
   ignore(onSelect);
   ignore(key);
   let currentMode =
@@ -865,26 +1197,31 @@ let make = (
     | None => false
     };
   ignore(pagedNavigation);
-  let showOutside = switch (showOutsideDays) {
+  let showOutside =
+    switch (showOutsideDays) {
     | Some(value) => value
     | None => false
-  };
-  let showWeekNum = switch (showWeekNumber) {
+    };
+  let showWeekNum =
+    switch (showWeekNumber) {
     | Some(value) => value
     | None => false
-  };
-  let hideWeekdaysValue = switch (hideWeekdays) {
+    };
+  let hideWeekdaysValue =
+    switch (hideWeekdays) {
     | Some(value) => value
     | None => false
-  };
-  let numberOfMonthsValue = switch (numberOfMonths) {
+    };
+  let numberOfMonthsValue =
+    switch (numberOfMonths) {
     | Some(value) => value
     | None => 1
-  };
-  let reverseMonthsValue = switch (reverseMonths) {
+    };
+  let reverseMonthsValue =
+    switch (reverseMonths) {
     | Some(value) => value
     | None => false
-  };
+    };
   let fixedWeeksValue =
     switch (fixedWeeks) {
     | Some(value) => value
@@ -898,57 +1235,97 @@ let make = (
     } else {
       Some(renderNavigation(~animate=animateValue, ~navigationDisabled));
     };
-  let monthIndices = Array.init(numberOfMonthsValue, (idx) => if (reverseMonthsValue) { numberOfMonthsValue - idx - 1 } else { idx });
+  let monthIndices =
+    Array.init(numberOfMonthsValue, idx =>
+      if (reverseMonthsValue) {
+        numberOfMonthsValue - idx - 1;
+      } else {
+        idx;
+      }
+    );
   let monthElements =
     monthIndices
     |> Array.mapi((renderIndex, monthIndex) => {
-      let embeddedNavigation =
-        if (navLayoutAfter && renderIndex == numberOfMonthsValue - 1) {
-          navigationElement;
-        } else {
-          None;
-        };
-      renderMonth(
-        monthIndex,
-        ~showOutsideDays=showOutside,
-        ~showWeekNumber=showWeekNum,
-        ~hideWeekdays=hideWeekdaysValue,
-        ~fixedWeeks=fixedWeeksValue,
-        ~captionLayout,
-        ~reverseYears=reverseYearsValue,
-        ~animate=animateValue,
-        ~navigationDisabled,
-        ~embeddedNavigation,
-        ~todayYear,
-        today,
-        selected,
-      );
-    });
+         let embeddedNavigation =
+           if (navLayoutAfter && renderIndex == numberOfMonthsValue - 1) {
+             navigationElement;
+           } else {
+             None;
+           };
+         renderMonth(
+           monthIndex,
+           ~showOutsideDays=showOutside,
+           ~showWeekNumber=showWeekNum,
+           ~hideWeekdays=hideWeekdaysValue,
+           ~fixedWeeks=fixedWeeksValue,
+           ~captionLayout,
+           ~reverseYears=reverseYearsValue,
+           ~animate=animateValue,
+           ~navigationDisabled,
+           ~embeddedNavigation,
+           ~todayYear,
+           today,
+           selected,
+         );
+       });
 
   let monthsChildren =
     switch (navigationElement) {
-    | Some(value) when !navLayoutAfter => [value, React.array(monthElements)]
+    | Some(value) when !navLayoutAfter => [
+        value,
+        React.array(monthElements),
+      ]
     | _ => [React.array(monthElements)]
     };
 
   let footerElement =
     switch (footer) {
     | Some(value) =>
-      element("div", ~props=[classNameProp(classNames.footer), roleProp("status"), stringProp("aria-live", "ariaLive", "polite")], [value]);
+      element(
+        "div",
+        ~props=[
+          classNameProp(classNames.footer),
+          roleProp("status"),
+          stringProp("aria-live", "ariaLive", "polite"),
+        ],
+        [value],
+      )
     | None => React.null
     };
 
   let rootProps =
     List.concat([
-      [classNameProp(classNames.root), stringProp("lang", "lang", "en-US"), stringProp("data-mode", "dataMode", currentMode)],
-      numberOfMonthsValue > 1 ? [stringProp("data-multiple-months", "dataMultipleMonths", "true")] : [],
-      showWeekNum ? [stringProp("data-week-numbers", "dataWeekNumbers", "true")] : [],
-      navLayoutAfter ? [stringProp("data-nav-layout", "dataNavLayout", navLayoutToString(`After))] : [],
+      [
+        classNameProp(classNames.root),
+        stringProp("lang", "lang", "en-US"),
+        stringProp("data-mode", "dataMode", currentMode),
+      ],
+      numberOfMonthsValue > 1
+        ? [stringProp("data-multiple-months", "dataMultipleMonths", "true")]
+        : [],
+      showWeekNum
+        ? [stringProp("data-week-numbers", "dataWeekNumbers", "true")] : [],
+      navLayoutAfter
+        ? [
+          stringProp(
+            "data-nav-layout",
+            "dataNavLayout",
+            navLayoutToString(`After),
+          ),
+        ]
+        : [],
     ]);
 
   element(
     "div",
     ~props=rootProps,
-    [element("div", ~props=[classNameProp(classNames.months)], monthsChildren), footerElement],
+    [
+      element(
+        "div",
+        ~props=[classNameProp(classNames.months)],
+        monthsChildren,
+      ),
+      footerElement,
+    ],
   );
 };
