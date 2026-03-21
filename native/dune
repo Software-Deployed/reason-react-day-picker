@@ -1,0 +1,13 @@
+(copy_files# "../ReactDayPicker.re")
+(copy_files# "../ReactDayPickerNative.re")
+
+(library
+ (name react_day_picker_native)
+ (public_name reason-react-day-picker.native)
+ (wrapped false)
+ (modes native)
+ (modules ReactDayPicker ReactDayPickerNative)
+ (optional)
+ (preprocess
+   (pps server-reason-react.browser_ppx server-reason-react.ppx))
+ (libraries server-reason-react.react server-reason-react.js))

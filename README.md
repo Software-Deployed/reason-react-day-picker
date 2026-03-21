@@ -36,52 +36,58 @@ opam install server-reason-react
 ### Melange (Browser)
 
 ```ocaml
-let props =
-  ReactDayPicker.makeProps(
-    ~mode=`Range,
-    ~selected=`Range(Js.Undefined.return({
-      ReactDayPicker.from: Js.Undefined.return(openDate),
-      ReactDayPicker.to_: Js.Undefined.return(closeDate),
-    })),
-    ~onSelect=`Range((dates: ReactDayPicker.rangeDate) => {
-      switch (dates->Js.Undefined.toOption) {
-      | Some(dates) =>
-        let openDate =
-          switch (dates.from->Js.Undefined.toOption) {
-          | Some(date) => date
-          | None => today
-          };
-        let closeDate =
-          switch (dates.to_->Js.Undefined.toOption) {
-          | Some(date) => date
-          | None => openDate
-          };
-        updateOpenDate(openDate);
-        updateCloseDate(closeDate);
-      | None =>
-        updateOpenDate(today);
-        updateCloseDate(today);
-      };
-    }),
-    (),
-  );
-
-let calendar = React.createElement(ReactDayPicker.make, props);
+let calendar =
+  <ReactDayPicker
+    mode="range"
+    selected={
+      `Range(
+        Js.Undefined.return({
+          ReactDayPicker.from: Js.Undefined.return(openDate),
+          ReactDayPicker.to_: Js.Undefined.return(closeDate),
+        }),
+      )
+    }
+    onSelect={
+      `Range((dates: ReactDayPicker.rangeDate) => {
+        switch (dates->Js.Undefined.toOption) {
+        | Some(dates) =>
+          let openDate =
+            switch (dates.from->Js.Undefined.toOption) {
+            | Some(date) => date
+            | None => today
+            };
+          let closeDate =
+            switch (dates.to_->Js.Undefined.toOption) {
+            | Some(date) => date
+            | None => openDate
+            };
+          setOpenDate(_prev => openDate);
+          setCloseDate(_prev => closeDate);
+        | None =>
+          setOpenDate(_prev => today);
+          setCloseDate(_prev => today);
+        }
+      })
+    }
+  />;
 ```
 
 ### Native (Server-Side Rendering)
+
+The native package now exposes the same `ReactDayPicker` component name as the
+Melange package, so the same JSX can render on both targets.
 
 ```reason
 let today = Js.Date.make();
 
 let calendar =
-  ReactDayPickerNative.make(
-    ~mode=`Single,
-    ~selected=`Single(Some(today)),
-    ~numberOfMonths=1,
-    ~showOutsideDays=true,
-    (),
-  );
+  <ReactDayPicker
+    mode="single"
+    onSelect={`Single((_date: ReactDayPicker.singleDate) => ())}
+    selected={`Single(Js.Undefined.return(today))}
+    numberOfMonths=1
+    showOutsideDays=true
+  />;
 
 /* Render to HTML string */
 let html = ReactDOM.renderToString(calendar);
@@ -101,14 +107,15 @@ node _build/default/example/js/render/example/js/JsRenderer.re.js
 The Melange renderer needs `react`, `react-dom`, and `react-day-picker`
 installed in `node_modules` to run under Node.
 
-#### Native Props
+#### Props
 
-The native implementation supports the following props:
+The shared `ReactDayPicker` component supports the following props:
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `mode` | `option(mode)` | Selection mode using `` `Single ``, `` `Multiple ``, or `` `Range `` |
-| `selected` | `option(selected)` | Selected date(s) |
+| `mode` | `string` | One of `"single"`, `"multiple"`, or `"range"` |
+| `selected` | `selected` | Selected date(s) |
+| `onSelect` | `onSelect` | Selection callback |
 | `captionLayout` | `option(captionLayout)` | Caption layout using typed constructors |
 | `navLayout` | `option(navLayout)` | Navigation layout using typed constructors |
 | `numberOfMonths` | `option(int)` | Number of months to display (default: 1) |
@@ -120,11 +127,7 @@ The native implementation supports the following props:
 #### Selection Types
 
 ```reason
-type mode = [
-  | `Single
-  | `Multiple
-  | `Range
-];
+type mode = string;
 
 type captionLayout = [
   | `Label
@@ -138,15 +141,24 @@ type navLayout = [
   | `After
 ];
 
+type singleDate = Js.Undefined.t(Js.Date.t);
+type multipleDate = Js.Undefined.t(array(Js.Date.t));
+
 type selected = [
-  | `Single(Js.Date.t option)
-  | `Multiple(array(Js.Date.t) option)
-  | `Range(dateRange option)
+  | `Single(singleDate)
+  | `Multiple(multipleDate)
+  | `Range(rangeDate)
+];
+
+type onSelect = [
+  | `Single(singleDate => unit)
+  | `Multiple(multipleDate => unit)
+  | `Range(rangeDate => unit)
 ];
 
 type dateRange = {
-  from: Js.Date.t option,
-  to_: Js.Date.t option,
+  from: singleDate,
+  to_: singleDate,
 };
 
 type reactNode = React.element;

@@ -6,9 +6,9 @@ This folder follows the same split used by `server-reason-react` demos:
 - `example/js/`: Melange renderer using `ReactDOMServer.renderToString`
 - `example/native/`: native renderer using `ReactDOM.renderToString`
 
-Both renderers use the same props and should produce matching HTML for the same
-fixture values in `example/shared/SharedFixture.re`, including `footer` via
-`React.string(...)`.
+Both renderers use the same `ReactDayPicker` name and props, and should
+produce matching HTML for the same fixture values in
+`example/shared/SharedFixture.re`, including `footer` via `React.string(...)`.
 
 ### Run the native renderer
 

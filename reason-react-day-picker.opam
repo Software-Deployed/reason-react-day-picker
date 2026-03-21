@@ -15,9 +15,9 @@ depends: [
   "melange"
   "reason"
   "melange-webapi"
-  "ppxlib"
   "reason-react-ppx"
   "reason-react"
+  "server-reason-react"
   "odoc" {with-doc}
 ]
 build: [

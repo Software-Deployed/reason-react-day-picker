@@ -6,13 +6,4 @@
  (modes melange)
  (libraries reason-react melange.js)
  (preprocess
-   (pps melange.ppx reason-react-ppx)))
-
-(library
- (name react_day_picker_native)
- (public_name reason-react-day-picker.native)
- (wrapped false)
- (modes native)
- (modules ReactDayPickerNative)
- (optional)
- (libraries server-reason-react.react server-reason-react.js))
+  (pps server-reason-react.browser_ppx -js melange.ppx reason-react-ppx)))

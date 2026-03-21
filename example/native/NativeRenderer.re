@@ -20,27 +20,28 @@ let footer =
 
 let captionLayout = config.captionLayout;
 let navLayout = config.navLayout;
+let onSelect = `Single((_date: ReactDayPicker.singleDate) => ());
 
 let dayPicker =
-  ReactDayPickerNative.make(
-    ~mode=`Single,
-    ~selected=`Single(Js.Undefined.fromOption(Some(demoDate))),
-    ~captionLayout?,
-    ~reverseYears=config.reverseYears,
-    ~navLayout?,
-    ~disableNavigation=config.disableNavigation,
-    ~hideNavigation=config.hideNavigation,
-    ~animate=config.animate,
-    ~fixedWeeks=config.fixedWeeks,
-    ~footer?,
-    ~hideWeekdays=config.hideWeekdays,
-    ~numberOfMonths=config.numberOfMonths,
-    ~reverseMonths=config.reverseMonths,
-    ~pagedNavigation=config.pagedNavigation,
-    ~showOutsideDays=config.showOutsideDays,
-    ~showWeekNumber=config.showWeekNumber,
-    (),
-  );
+  <ReactDayPicker
+    mode="single"
+    onSelect={onSelect}
+    selected={`Single(Js.Undefined.return(demoDate))}
+    captionLayout=?captionLayout
+    reverseYears=config.reverseYears
+    navLayout=?navLayout
+    disableNavigation=config.disableNavigation
+    hideNavigation=config.hideNavigation
+    animate=config.animate
+    fixedWeeks=config.fixedWeeks
+    footer=?footer
+    hideWeekdays=config.hideWeekdays
+    numberOfMonths=config.numberOfMonths
+    reverseMonths=config.reverseMonths
+    pagedNavigation=config.pagedNavigation
+    showOutsideDays=config.showOutsideDays
+    showWeekNumber=config.showWeekNumber
+  />;
 
 let rendered = ReactDOM.renderToString(dayPicker);
 
