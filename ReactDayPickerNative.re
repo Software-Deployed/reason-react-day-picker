@@ -446,7 +446,8 @@ type rangePosition =
   | NoRange
   | RangeStart
   | RangeMiddle
-  | RangeEnd;
+  | RangeEnd
+  | RangeStartAndEnd;
 
 let getRangePosition =
     (date: Js.Date.t, selected: option(selected)): rangePosition => {
@@ -454,33 +455,24 @@ let getRangePosition =
   | Some(`Range(optionRange)) =>
     switch (Js.Undefined.toOption(optionRange)) {
     | Some(rangeValue) =>
-      let isStart =
-        switch (Js.Undefined.toOption(rangeValue.from)) {
-        | Some(value) => isSameDay(date, value)
-        | None => false
+      let startOpt = Js.Undefined.toOption(rangeValue.from);
+      let endOpt = Js.Undefined.toOption(rangeValue.to_);
+      switch (startOpt, endOpt) {
+      | (Some(start), Some(rangeEnd)) =>
+        let isStart = isSameDay(date, start);
+        let isEnd = isSameDay(date, rangeEnd);
+        if (isStart && isEnd) {
+          RangeStartAndEnd;
+        } else if (isStart) {
+          RangeStart;
+        } else if (isEnd) {
+          RangeEnd;
+        } else if (isAfter(date, start) && isBefore(date, rangeEnd)) {
+          RangeMiddle;
+        } else {
+          NoRange;
         };
-      let isEnd =
-        switch (Js.Undefined.toOption(rangeValue.to_)) {
-        | Some(value) => isSameDay(date, value)
-        | None => false
-        };
-      if (isStart) {
-        RangeStart;
-      } else if (isEnd) {
-        RangeEnd;
-      } else {
-        switch (
-          Js.Undefined.toOption(rangeValue.from),
-          Js.Undefined.toOption(rangeValue.to_),
-        ) {
-        | (Some(start), Some(stop)) =>
-          if (isAfter(date, start) && isBefore(date, stop)) {
-            RangeMiddle;
-          } else {
-            NoRange;
-          }
-        | _ => NoRange
-        };
+      | _ => NoRange
       };
     | None => NoRange
     }
@@ -515,8 +507,9 @@ let ordinalSuffix = (day: int): string => {
   };
 };
 
-let formatAriaDayLabel = (date: Js.Date.t, ~isToday: bool): string => {
+let formatAriaDayLabel = (date: Js.Date.t, ~isToday: bool, ~isSelected: bool): string => {
   let prefix = if (isToday) {"Today, "} else {""};
+  let suffix = if (isSelected) {", selected"} else {""};
   prefix
   ++ getWeekdayName(dayOfWeek(date))
   ++ ", "
@@ -525,7 +518,8 @@ let formatAriaDayLabel = (date: Js.Date.t, ~isToday: bool): string => {
   ++ string_of_int(dateDay(date))
   ++ ordinalSuffix(dateDay(date))
   ++ ", "
-  ++ string_of_int(dateYear(date));
+  ++ string_of_int(dateYear(date))
+  ++ suffix;
 };
 
 let getDayClasses =
@@ -556,6 +550,8 @@ let getDayClasses =
     modifiers := List.concat([modifiers^, [classNames.dayRangeMiddle]])
   | RangeEnd =>
     modifiers := List.concat([modifiers^, [classNames.dayRangeEnd]])
+  | RangeStartAndEnd =>
+    modifiers := List.concat([modifiers^, [classNames.dayRangeStart, classNames.dayRangeEnd]])
   | NoRange => ()
   };
 
@@ -866,13 +862,28 @@ let renderWeekRow =
          let cellClassName =
            getDayClasses(day, selected, today, showOutsideDays);
          let dayIsToday = isSameDay(day.date, today);
+         let dayIsSelected = isDateSelected(day.date, selected);
          let hasContent = showOutsideDays || !day.isOutside;
-         let tdProps =
-           ref([
-             classNameProp(cellClassName),
-             roleProp("gridcell"),
-             stringProp("data-day", "dataDay", formatISODate(day.date)),
+         let tdProps = ref([classNameProp(cellClassName), roleProp("gridcell")]);
+         if (dayIsSelected) {
+           tdProps :=
+             List.concat([
+               tdProps^,
+               [stringProp("aria-selected", "ariaSelected", "true")],
+             ]);
+         };
+         tdProps :=
+           List.concat([
+             tdProps^,
+             [stringProp("data-day", "dataDay", formatISODate(day.date))],
            ]);
+         if (dayIsSelected) {
+           tdProps :=
+             List.concat([
+               tdProps^,
+               [stringProp("data-selected", "dataSelected", "true")],
+             ]);
+         };
          if (day.isOutside) {
            tdProps :=
              List.concat([
@@ -914,7 +925,11 @@ let renderWeekRow =
                  stringProp("type", "type", "button"),
                  intProp("tabindex", "tabIndex", dayIsToday ? 0 : (-1)),
                  ariaLabelProp(
-                   formatAriaDayLabel(day.date, ~isToday=dayIsToday),
+                   formatAriaDayLabel(
+                     day.date,
+                     ~isToday=dayIsToday,
+                     ~isSelected=dayIsSelected,
+                   ),
                  ),
                ],
                [React.string(formatDayNumber(day.date))],
@@ -936,6 +951,7 @@ let renderWeekRow =
 let renderMonth =
     (
       monthIndex: int,
+      ~multiSelectable: bool,
       ~showOutsideDays: bool,
       ~showWeekNumber: bool,
       ~hideWeekdays: bool,
@@ -1023,7 +1039,7 @@ let renderMonth =
             stringProp(
               "aria-multiselectable",
               "ariaMultiselectable",
-              "false",
+              multiSelectable ? "true" : "false",
             ),
             ariaLabelProp(formatMonthYear(monthStart)),
             classNameProp(classNames.monthGrid),
@@ -1043,7 +1059,7 @@ let renderMonth =
             stringProp(
               "aria-multiselectable",
               "ariaMultiselectable",
-              "false",
+              multiSelectable ? "true" : "false",
             ),
             ariaLabelProp(formatMonthYear(monthStart)),
             classNameProp(classNames.monthGrid),
@@ -1171,6 +1187,7 @@ let make =
     | Some(value) => modeToString(value)
     | None => modeToString(`Single)
     };
+  let multiSelectable = currentMode == "multiple" || currentMode == "range";
   let reverseYearsValue =
     switch (reverseYears) {
     | Some(value) => value
@@ -1252,11 +1269,12 @@ let make =
            } else {
              None;
            };
-         renderMonth(
-           monthIndex,
-           ~showOutsideDays=showOutside,
-           ~showWeekNumber=showWeekNum,
-           ~hideWeekdays=hideWeekdaysValue,
+          renderMonth(
+            monthIndex,
+            ~multiSelectable,
+            ~showOutsideDays=showOutside,
+            ~showWeekNumber=showWeekNum,
+            ~hideWeekdays=hideWeekdaysValue,
            ~fixedWeeks=fixedWeeksValue,
            ~captionLayout,
            ~reverseYears=reverseYearsValue,

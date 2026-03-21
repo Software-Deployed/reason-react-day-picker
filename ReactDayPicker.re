@@ -50,6 +50,12 @@ type onSelect = [
   | `Range(rangeDate => unit)
 ];
 
+let defined = (value: 'a): Js.Undefined.t('a) =>
+  switch%platform (Runtime.platform) {
+  | Server => Js.Undefined.fromOption(Some(value))
+  | Client => Js.Undefined.return(value)
+  };
+
 [@platform js]
 module ClientImpl = {
   type jsDateRange = {
@@ -59,17 +65,10 @@ module ClientImpl = {
 
   type jsRangeDate = Js.Undefined.t(jsDateRange);
 
-  type jsSelected = [
-    | `Single(singleDate)
-    | `Multiple(multipleDate)
-    | `Range(jsRangeDate)
-  ];
+  /* react-day-picker expects the raw value, not a variant wrapper */
+  type jsSelected = Js.Json.t;
 
-  type jsOnSelect = [
-    | `Single(singleDate => unit)
-    | `Multiple(multipleDate => unit)
-    | `Range(jsRangeDate => unit)
-  ];
+  type jsOnSelect = Js.Json.t;
 
   let emptyRangeDate: jsRangeDate = Js.Undefined.fromOption(None);
 
@@ -91,23 +90,24 @@ module ClientImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      Js.Undefined.return(nextValue)
+      defined(nextValue)
     | None => Js.Undefined.fromOption(None)
     };
 
+  /* Convert our polymorphic variant to the raw value that react-day-picker expects */
   let toJsSelected = (value: selected): jsSelected =>
     switch (value) {
-    | `Single(date) => `Single(date)
-    | `Multiple(dates) => `Multiple(dates)
-    | `Range(rangeValue) => `Range(toJsRangeDate(rangeValue))
+    | `Single(date) => Obj.magic(date)
+    | `Multiple(dates) => Obj.magic(dates)
+    | `Range(rangeValue) => Obj.magic(toJsRangeDate(rangeValue))
     };
 
   let toJsOnSelect = (value: onSelect): jsOnSelect =>
     switch (value) {
-    | `Single(callback) => `Single(callback)
-    | `Multiple(callback) => `Multiple(callback)
+    | `Single(callback) => Obj.magic(callback)
+    | `Multiple(callback) => Obj.magic(callback)
     | `Range(callback) =>
-      `Range((dates: jsRangeDate) => callback(fromJsRangeDate(dates)))
+      Obj.magic((dates: jsRangeDate) => callback(fromJsRangeDate(dates)))
     };
 
   [@mel.obj]
@@ -264,7 +264,7 @@ module ServerImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      Js.Undefined.return(nextValue)
+      defined(nextValue)
     | None => emptyRangeDate
     };
 
@@ -275,7 +275,7 @@ module ServerImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      Js.Undefined.return(nextValue)
+      defined(nextValue)
     | None => Js.Undefined.fromOption(None)
     };
 

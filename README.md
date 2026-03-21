@@ -40,12 +40,10 @@ let calendar =
   <ReactDayPicker
     mode="range"
     selected={
-      `Range(
-        Js.Undefined.return({
-          ReactDayPicker.from: Js.Undefined.return(openDate),
-          ReactDayPicker.to_: Js.Undefined.return(closeDate),
-        }),
-      )
+      `Range(ReactDayPicker.defined({
+        ReactDayPicker.from: ReactDayPicker.defined(openDate),
+        ReactDayPicker.to_: ReactDayPicker.defined(closeDate),
+      }))
     }
     onSelect={
       `Range((dates: ReactDayPicker.rangeDate) => {
@@ -77,6 +75,10 @@ let calendar =
 The native package now exposes the same `ReactDayPicker` component name as the
 Melange package, so the same JSX can render on both targets.
 
+Use `ReactDayPicker.defined(...)` for shared `Js.Undefined.t(...)` values. It
+avoids the native `Js.Undefined.return` float-representation trap when working
+with `Js.Date.t`.
+
 ```reason
 let today = Js.Date.make();
 
@@ -84,7 +86,7 @@ let calendar =
   <ReactDayPicker
     mode="single"
     onSelect={`Single((_date: ReactDayPicker.singleDate) => ())}
-    selected={`Single(Js.Undefined.return(today))}
+    selected={`Single(ReactDayPicker.defined(today))}
     numberOfMonths=1
     showOutsideDays=true
   />;
@@ -96,7 +98,8 @@ let html = ReactDOM.renderToString(calendar);
 ### Example parity check
 
 This repo includes a small universal example in `example/` that mirrors the
-layout used by `server-reason-react` demos:
+layout used by `server-reason-react` demos. It renders both a `mode="single"`
+picker and a `mode="range"` picker with the same shared props on JS and native:
 
 ```bash
 dune exec ./example/native/NativeRenderer.exe

@@ -1,6 +1,4 @@
-let demoYear = 2026;
-let demoMonth = 0;
-let demoDay = 15;
+/* Demo dates are now derived from today's date in ExampleDayPickers.re */
 
 let numberOfMonths = 1;
 let showOutsideDays = true;

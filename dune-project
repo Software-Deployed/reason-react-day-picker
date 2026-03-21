@@ -19,14 +19,15 @@
  (name reason-react-day-picker)
  (synopsis "Melange bindings for react-day-picker")
  (description "Melange bindings for react-day-picker written in ReasonML")
- (depends
-  ocaml
-  melange
-  reason
-  melange-webapi
-  reason-react-ppx
-  reason-react
-  server-reason-react)
+  (depends
+   ocaml
+   melange
+   reason
+   melange-webapi
+   reason-react-ppx
+   reason-react
+   server-reason-react
+   (alcotest :with-test))
  (allow_empty)
  (tags
   ("melange" "reason" "bindings" "react-day-picker" "react")))
