@@ -50,17 +50,12 @@ type onSelect = [
   | `Range(rangeDate => unit)
 ];
 
-let defined = (value: 'a): Js.Undefined.t('a) =>
-  switch%platform (Runtime.platform) {
-  | Server => Js.Undefined.fromOption(Some(value))
-  | Client => Js.Undefined.return(value)
-  };
-
 [@platform js]
 module ClientImpl = {
   type jsDateRange = {
     from: singleDate,
-    [@mel.as "to"] to_: singleDate,
+    [@mel.as "to"]
+    to_: singleDate,
   };
 
   type jsRangeDate = Js.Undefined.t(jsDateRange);
@@ -79,7 +74,7 @@ module ClientImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      Js.Undefined.return(nextValue)
+      Js.Undefined.return(nextValue);
     | None => emptyRangeDate
     };
 
@@ -90,7 +85,7 @@ module ClientImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      defined(nextValue)
+      Js.Undefined.return(nextValue);
     | None => Js.Undefined.fromOption(None)
     };
 
@@ -130,7 +125,7 @@ module ClientImpl = {
       ~pagedNavigation: bool=?,
       ~showOutsideDays: bool=?,
       ~showWeekNumber: bool=?,
-      unit,
+      unit
     ) =>
     {
       .
@@ -177,26 +172,27 @@ module ClientImpl = {
     React.element =
     "DayPicker";
 
-  let render = (
-    ~mode,
-    ~selected,
-    ~onSelect,
-    ~captionLayout: option(captionLayout)=?,
-    ~reverseYears: option(bool)=?,
-    ~navLayout: option(navLayout)=?,
-    ~disableNavigation: option(bool)=?,
-    ~hideNavigation: option(bool)=?,
-    ~animate: option(bool)=?,
-    ~fixedWeeks: option(bool)=?,
-    ~footer: option(reactNode)=?,
-    ~hideWeekdays: option(bool)=?,
-    ~numberOfMonths: option(int)=?,
-    ~reverseMonths: option(bool)=?,
-    ~pagedNavigation: option(bool)=?,
-    ~showOutsideDays: option(bool)=?,
-    ~showWeekNumber: option(bool)=?,
-    (),
-  ) => {
+  let render =
+      (
+        ~mode,
+        ~selected,
+        ~onSelect,
+        ~captionLayout: option(captionLayout)=?,
+        ~reverseYears: option(bool)=?,
+        ~navLayout: option(navLayout)=?,
+        ~disableNavigation: option(bool)=?,
+        ~hideNavigation: option(bool)=?,
+        ~animate: option(bool)=?,
+        ~fixedWeeks: option(bool)=?,
+        ~footer: option(reactNode)=?,
+        ~hideWeekdays: option(bool)=?,
+        ~numberOfMonths: option(int)=?,
+        ~reverseMonths: option(bool)=?,
+        ~pagedNavigation: option(bool)=?,
+        ~showOutsideDays: option(bool)=?,
+        ~showWeekNumber: option(bool)=?,
+        (),
+      ) => {
     let captionLayout =
       switch (captionLayout) {
       | Some(value) => Some(captionLayoutToString(value))
@@ -241,7 +237,8 @@ module ServerImpl = {
     | _ => `Single
     };
 
-  let captionLayoutFromShared = (value: captionLayout): ReactDayPickerNative.captionLayout =>
+  let captionLayoutFromShared =
+      (value: captionLayout): ReactDayPickerNative.captionLayout =>
     switch (value) {
     | `Label => `Label
     | `Dropdown => `Dropdown
@@ -255,7 +252,8 @@ module ServerImpl = {
     | `After => `After
     };
 
-  let emptyRangeDate: ReactDayPickerNative.rangeDate = Js.Undefined.fromOption(None);
+  let emptyRangeDate: ReactDayPickerNative.rangeDate =
+    Js.Undefined.fromOption(None);
 
   let toNativeRangeDate = (value: rangeDate): ReactDayPickerNative.rangeDate =>
     switch (Js.Undefined.toOption(value)) {
@@ -264,7 +262,7 @@ module ServerImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      defined(nextValue)
+      Js.Undefined.return(nextValue);
     | None => emptyRangeDate
     };
 
@@ -275,7 +273,7 @@ module ServerImpl = {
         from: rangeValue.from,
         to_: rangeValue.to_,
       };
-      defined(nextValue)
+      Js.Undefined.return(nextValue);
     | None => Js.Undefined.fromOption(None)
     };
 
@@ -291,31 +289,33 @@ module ServerImpl = {
     | `Single(callback) => `Single(callback)
     | `Multiple(callback) => `Multiple(callback)
     | `Range(callback) =>
-      `Range((dates: ReactDayPickerNative.rangeDate) =>
-        callback(fromNativeRangeDate(dates))
+      `Range(
+        (dates: ReactDayPickerNative.rangeDate) =>
+          callback(fromNativeRangeDate(dates)),
       )
     };
 
-  let render = (
-    ~mode,
-    ~selected,
-    ~onSelect,
-    ~captionLayout: option(captionLayout)=?,
-    ~reverseYears: option(bool)=?,
-    ~navLayout: option(navLayout)=?,
-    ~disableNavigation: option(bool)=?,
-    ~hideNavigation: option(bool)=?,
-    ~animate: option(bool)=?,
-    ~fixedWeeks: option(bool)=?,
-    ~footer: option(reactNode)=?,
-    ~hideWeekdays: option(bool)=?,
-    ~numberOfMonths: option(int)=?,
-    ~reverseMonths: option(bool)=?,
-    ~pagedNavigation: option(bool)=?,
-    ~showOutsideDays: option(bool)=?,
-    ~showWeekNumber: option(bool)=?,
-    (),
-  ) => {
+  let render =
+      (
+        ~mode,
+        ~selected,
+        ~onSelect,
+        ~captionLayout: option(captionLayout)=?,
+        ~reverseYears: option(bool)=?,
+        ~navLayout: option(navLayout)=?,
+        ~disableNavigation: option(bool)=?,
+        ~hideNavigation: option(bool)=?,
+        ~animate: option(bool)=?,
+        ~fixedWeeks: option(bool)=?,
+        ~footer: option(reactNode)=?,
+        ~hideWeekdays: option(bool)=?,
+        ~numberOfMonths: option(int)=?,
+        ~reverseMonths: option(bool)=?,
+        ~pagedNavigation: option(bool)=?,
+        ~showOutsideDays: option(bool)=?,
+        ~showWeekNumber: option(bool)=?,
+        (),
+      ) => {
     let captionLayout =
       switch (captionLayout) {
       | Some(value) => Some(captionLayoutFromShared(value))
@@ -350,26 +350,27 @@ module ServerImpl = {
 };
 
 [@react.component]
-let make = (
-  ~mode: mode,
-  ~selected: selected,
-  ~onSelect: onSelect,
-  ~captionLayout: option(captionLayout)=?,
-  ~reverseYears: option(bool)=?,
-  ~navLayout: option(navLayout)=?,
-  ~disableNavigation: option(bool)=?,
-  ~hideNavigation: option(bool)=?,
-  ~animate: option(bool)=?,
-  ~fixedWeeks: option(bool)=?,
-  ~footer: option(reactNode)=?,
-  ~hideWeekdays: option(bool)=?,
-  ~numberOfMonths: option(int)=?,
-  ~reverseMonths: option(bool)=?,
-  ~pagedNavigation: option(bool)=?,
-  ~showOutsideDays: option(bool)=?,
-  ~showWeekNumber: option(bool)=?,
-  (),
-) =>
+let make =
+    (
+      ~mode: mode,
+      ~selected: selected,
+      ~onSelect: onSelect,
+      ~captionLayout: option(captionLayout)=?,
+      ~reverseYears: option(bool)=?,
+      ~navLayout: option(navLayout)=?,
+      ~disableNavigation: option(bool)=?,
+      ~hideNavigation: option(bool)=?,
+      ~animate: option(bool)=?,
+      ~fixedWeeks: option(bool)=?,
+      ~footer: option(reactNode)=?,
+      ~hideWeekdays: option(bool)=?,
+      ~numberOfMonths: option(int)=?,
+      ~reverseMonths: option(bool)=?,
+      ~pagedNavigation: option(bool)=?,
+      ~showOutsideDays: option(bool)=?,
+      ~showWeekNumber: option(bool)=?,
+      (),
+    ) =>
   switch%platform (Runtime.platform) {
   | Server =>
     ServerImpl.render(
