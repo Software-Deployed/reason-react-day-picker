@@ -468,6 +468,48 @@ let isDateSelected = (date: Js.Date.t, selected: option(selected)): bool => {
   };
 };
 
+let isFocusableDay = (day: calendarDay): bool => !day.isOutside;
+
+let getInitialFocusTarget = (
+  weeks: array(calendarWeek),
+  selected: option(selected),
+  today: Js.Date.t,
+): option(Js.Date.t) => {
+  let firstFocusable = ref(None);
+  let selectedFocusable = ref(None);
+  let todayFocusable = ref(None);
+  let setIfEmpty = (targetRef, value) =>
+    switch (targetRef^) {
+    | None => targetRef := Some(value)
+    | Some(_) => ()
+    };
+
+  weeks
+  |> Array.iter((week: calendarWeek) =>
+       week.days
+       |> Array.iter((day: calendarDay) => {
+            if (isFocusableDay(day)) {
+              setIfEmpty(firstFocusable, day.date);
+              if (isSameDay(day.date, today)) {
+                setIfEmpty(todayFocusable, day.date);
+              };
+              if (isDateSelected(day.date, selected)) {
+                setIfEmpty(selectedFocusable, day.date);
+              };
+            };
+          })
+     );
+
+  switch (selectedFocusable^) {
+  | Some(_) as target => target
+  | None =>
+    switch (todayFocusable^) {
+    | Some(_) as target => target
+    | None => firstFocusable^
+    }
+  };
+};
+
 type rangePosition =
   | NoRange
   | RangeStart
@@ -862,6 +904,7 @@ let renderWeekRow =
     (
       week: calendarWeek,
       ~showWeekNum: bool,
+      ~focusTarget: option(Js.Date.t),
       selected: option(selected),
       today: Js.Date.t,
       showOutsideDays: bool,
@@ -889,6 +932,11 @@ let renderWeekRow =
            getDayClasses(day, selected, today, showOutsideDays);
          let dayIsToday = isSameDay(day.date, today);
          let dayIsSelected = isDateSelected(day.date, selected);
+         let dayIsFocusTarget =
+           switch (focusTarget) {
+           | Some(target) => isSameDay(day.date, target)
+           | None => false
+           };
          let hasContent = showOutsideDays || !day.isOutside;
          let tdProps = ref([classNameProp(cellClassName), roleProp("gridcell")]);
          if (dayIsSelected) {
@@ -949,10 +997,10 @@ let renderWeekRow =
                 ~props=[
                   classNameProp(classNames.dayButton),
                   stringProp("type", "type", "button"),
-                  intProp("tabindex", "tabIndex", dayIsSelected ? 0 : (-1)),
-                 ariaLabelProp(
-                   formatAriaDayLabel(
-                     day.date,
+                  intProp("tabindex", "tabIndex", dayIsFocusTarget ? 0 : (-1)),
+                  ariaLabelProp(
+                    formatAriaDayLabel(
+                      day.date,
                      ~isToday=dayIsToday,
                      ~isSelected=dayIsSelected,
                    ),
@@ -994,17 +1042,19 @@ let renderMonth =
   let monthStart =
     startOfMonth(today) |> setMonth(_, dateMonth(today) + monthIndex);
   let weeks = buildMonthWeeks(monthStart, ~weekStartsOn=0, ~fixedWeeks, ());
+  let focusTarget = getInitialFocusTarget(weeks, selected, today);
   let weekdayHeader =
     hideWeekdays ? React.null : renderWeekdayHeader(showWeekNumber, ~animate);
   let weekRows =
     weeks
     |> Array.map((week: calendarWeek) =>
          renderWeekRow(
-           week,
-           ~showWeekNum=showWeekNumber,
-           selected,
-           today,
-           showOutsideDays,
+            week,
+            ~showWeekNum=showWeekNumber,
+            ~focusTarget,
+            selected,
+            today,
+            showOutsideDays,
          )
        );
 
