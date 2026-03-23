@@ -5,22 +5,22 @@ let selected =
   | Some(from) =>
     switch (config.rangeTo) {
     | Some(to_) =>
-      `Range(ReactDayPicker.defined({
-        ReactDayPicker.from: ReactDayPicker.defined(from),
-        ReactDayPicker.to_: ReactDayPicker.defined(to_),
+      `Range(Js.Undefined.return({
+        ReactDayPicker.from: Js.Undefined.return(from),
+        ReactDayPicker.to_: Js.Undefined.return(to_),
       }));
     | None =>
-      `Range(ReactDayPicker.defined({
-        ReactDayPicker.from: ReactDayPicker.defined(from),
+      `Range(Js.Undefined.return({
+        ReactDayPicker.from: Js.Undefined.return(from),
         ReactDayPicker.to_: Js.Undefined.fromOption(None),
       }));
     };
   | None =>
     switch (config.rangeTo) {
     | Some(to_) =>
-      `Range(ReactDayPicker.defined({
+      `Range(Js.Undefined.return({
         ReactDayPicker.from: Js.Undefined.fromOption(None),
-        ReactDayPicker.to_: ReactDayPicker.defined(to_),
+        ReactDayPicker.to_: Js.Undefined.return(to_),
       }));
     | None =>
       `Range(Js.Undefined.fromOption(None));

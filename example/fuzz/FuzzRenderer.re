@@ -40,14 +40,14 @@ let renderFuzzConfig = (config: fuzzConfig) => {
     | "single" =>
       let date =
         switch (config.singleDate) {
-        | Some(d) => ReactDayPicker.defined(d)
+        | Some(d) => Js.Undefined.return(d)
         | None => Js.Undefined.fromOption(None)
         };
       `Single(date);
     | "multiple" =>
       let dates =
         switch (config.multipleDates) {
-        | Some(d) => ReactDayPicker.defined(d)
+        | Some(d) => Js.Undefined.return(d)
         | None => Js.Undefined.fromOption(None)
         };
       `Multiple(dates);
@@ -57,9 +57,9 @@ let renderFuzzConfig = (config: fuzzConfig) => {
         | Some(from) =>
           switch (config.rangeTo) {
           | Some(to_) =>
-            ReactDayPicker.defined({
-              ReactDayPicker.from: ReactDayPicker.defined(from),
-              ReactDayPicker.to_: ReactDayPicker.defined(to_),
+            Js.Undefined.return({
+              ReactDayPicker.from: Js.Undefined.return(from),
+              ReactDayPicker.to_: Js.Undefined.return(to_),
             });
           | None => Js.Undefined.fromOption(None)
           };

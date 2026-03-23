@@ -916,14 +916,14 @@ let renderWeekRow =
              ]);
          };
 
-         let content =
-           if (hasContent) {
-             element(
-               "button",
-               ~props=[
-                 classNameProp(classNames.dayButton),
-                 stringProp("type", "type", "button"),
-                 intProp("tabindex", "tabIndex", dayIsToday ? 0 : (-1)),
+          let content =
+            if (hasContent) {
+              element(
+                "button",
+                ~props=[
+                  classNameProp(classNames.dayButton),
+                  stringProp("type", "type", "button"),
+                  intProp("tabindex", "tabIndex", dayIsSelected ? 0 : (-1)),
                  ariaLabelProp(
                    formatAriaDayLabel(
                      day.date,

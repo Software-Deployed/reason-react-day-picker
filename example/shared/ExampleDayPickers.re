@@ -60,7 +60,7 @@ let renderPicker = (
 let singleDayPicker =
   renderPicker(
     ~mode="single",
-    ~selected=`Single(ReactDayPicker.defined(today)),
+    ~selected=`Single(Js.Undefined.return(today)),
     ~onSelect=`Single((_date: ReactDayPicker.singleDate) => ()),
   );
 
@@ -72,9 +72,9 @@ let rangeDayPicker = {
 
   renderPicker(
     ~mode="range",
-    ~selected=`Range(ReactDayPicker.defined({
-      ReactDayPicker.from: ReactDayPicker.defined(openDate),
-      ReactDayPicker.to_: ReactDayPicker.defined(closeDate),
+    ~selected=`Range(Js.Undefined.return({
+      ReactDayPicker.from: Js.Undefined.return(openDate),
+      ReactDayPicker.to_: Js.Undefined.return(closeDate),
     })),
     ~onSelect=`Range((dates: ReactDayPicker.rangeDate) => {
       switch (Js.Undefined.toOption(dates)) {
