@@ -18,6 +18,7 @@ depends: [
   "reason-react-ppx"
   "reason-react"
   "server-reason-react"
+  "alcotest" {with-test}
   "odoc" {with-doc}
 ]
 build: [
