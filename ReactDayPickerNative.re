@@ -188,10 +188,36 @@ let setMonth = (date: Js.Date.t, month: int): Js.Date.t => {
 let startOfMonth = (date: Js.Date.t): Js.Date.t =>
   newDate(~year=dateYear(date), ~month=dateMonth(date), ~day=1);
 
-let isBefore = (a: Js.Date.t, b: Js.Date.t): bool =>
-  Js.Date.getTime(a) < Js.Date.getTime(b);
-let isAfter = (a: Js.Date.t, b: Js.Date.t): bool =>
-  Js.Date.getTime(a) > Js.Date.getTime(b);
+let isBefore = (a: Js.Date.t, b: Js.Date.t): bool => {
+  let yearA = dateYear(a);
+  let yearB = dateYear(b);
+  if (yearA != yearB) {
+    yearA < yearB;
+  } else {
+    let monthA = dateMonth(a);
+    let monthB = dateMonth(b);
+    if (monthA != monthB) {
+      monthA < monthB;
+    } else {
+      dateDay(a) < dateDay(b);
+    };
+  };
+};
+let isAfter = (a: Js.Date.t, b: Js.Date.t): bool => {
+  let yearA = dateYear(a);
+  let yearB = dateYear(b);
+  if (yearA != yearB) {
+    yearA > yearB;
+  } else {
+    let monthA = dateMonth(a);
+    let monthB = dateMonth(b);
+    if (monthA != monthB) {
+      monthA > monthB;
+    } else {
+      dateDay(a) > dateDay(b);
+    };
+  };
+};
 
 let isSameDay = (a: Js.Date.t, b: Js.Date.t): bool => {
   dateYear(a) == dateYear(b)
