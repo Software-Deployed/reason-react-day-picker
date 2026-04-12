@@ -1,0 +1,20 @@
+(library
+ (name day_picker_browser_test)
+ (modules Playwright BrowserTestUtils TestServer DayPickerExample DayPickerBrowserTest)
+ (wrapped false)
+ (libraries melange.js reason-react reason-react-day-picker)
+ (modes melange)
+ (preprocess
+  (pps melange.ppx reason-react-ppx)))
+
+(melange.emit
+ (target dist)
+ (alias day-picker-browser-tests)
+ (modules ())
+ (module_systems (esm "mjs"))
+ (libraries day_picker_browser_test reason-react-day-picker))
+
+; Browser tests are run via:
+;   ./example/test-browser/run-browser-test.sh
+; or
+;   npm run test:browser

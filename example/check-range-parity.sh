@@ -24,6 +24,7 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
 dune build -j1 @example/js/melange example/native/RangeNativeRenderer.exe
+dune exec ./example/native/test/RangeNativeTest.exe
 
 for scenario in "${scenarios[@]}"; do
   node "_build/default/example/js/render/example/js/RangeJsRenderer.re.js" "$scenario" > "$tmpdir/js.txt"

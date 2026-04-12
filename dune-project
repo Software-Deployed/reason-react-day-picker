@@ -1,4 +1,4 @@
-(lang dune 3.20)
+(lang dune 3.21)
 
 (name reason-react-day-picker)
 
@@ -32,7 +32,9 @@
   reason-react-ppx
   reason-react
   server-reason-react
-  (alcotest :with-test))
+   (alcotest :with-test)
+   (crowbar :with-test)
+   (alcobar :with-test))
  (allow_empty)
  (tags
   ("melange" "reason" "bindings" "react-day-picker" "react")))

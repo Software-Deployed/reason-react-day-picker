@@ -21,161 +21,263 @@ type fuzzConfig = {
   rangeTo: option(Js.Date.t),
 };
 
-let randomBool = () => Random.int(2) == 0;
+let optionGen = gen =>
+  Alcobar.choose([
+    Alcobar.const(None),
+    Alcobar.map([gen], v => Some(v)),
+  ]);
 
-let randomInt = (~min, ~max) => min + Random.int(max - min + 1);
+let captionLayoutGen =
+  Alcobar.choose([
+    Alcobar.const(None),
+    Alcobar.const(Some(`Label)),
+    Alcobar.const(Some(`Dropdown)),
+    Alcobar.const(Some(`DropdownMonths)),
+    Alcobar.const(Some(`DropdownYears)),
+  ]);
 
-let randomOption = (value: 'a) => randomBool() ? Some(value) : None;
+let navLayoutGen =
+  Alcobar.choose([
+    Alcobar.const(None),
+    Alcobar.const(Some(`Around)),
+    Alcobar.const(Some(`After)),
+  ]);
 
-let randomCaptionLayout = () =>
-  switch (Random.int(4)) {
-  | 0 => Some(`Label)
-  | 1 => Some(`Dropdown)
-  | 2 => Some(`DropdownMonths)
-  | 3 => Some(`DropdownYears)
-  | _ => None
-  };
+let rangeGen = (~min: int, ~max: int) =>
+  Alcobar.map([Alcobar.range(max - min + 1)], n => min + n);
 
-let randomNavLayout = () =>
-  switch (Random.int(3)) {
-  | 0 => Some(`Around)
-  | 1 => Some(`After)
-  | _ => None
-  };
-
-let randomDate = (~baseYear, ~baseMonth) => {
-  let day = randomInt(~min=1, ~max=28);
-  Js.Date.make(
-    ~year=float_of_int(baseYear),
-    ~month=float_of_int(baseMonth),
-    ~date=float_of_int(day),
-    ~hours=12.0,
-    ~minutes=0.0,
-    ~seconds=0.0,
-    (),
+let dateGen = (~baseYear: int, ~baseMonth: int) =>
+  Alcobar.map([rangeGen(~min=1, ~max=28)], day =>
+    Js.Date.make(
+      ~year=float_of_int(baseYear),
+      ~month=float_of_int(baseMonth),
+      ~date=float_of_int(day),
+      ~hours=12.0,
+      ~minutes=0.0,
+      ~seconds=0.0,
+      (),
+    )
   );
-};
 
-let generateSingleConfig = (~seed, ~baseYear, ~baseMonth): fuzzConfig => {
-  Random.init(seed);
-  let mode = "single";
-  let singleDate =
-    if (randomBool()) {
-      Some(randomDate(~baseYear, ~baseMonth));
-    } else {
-      None;
-    };
-  
-  {
-    name: "fuzz-single-" ++ string_of_int(seed),
+let singleConfigGen = (~baseYear: int, ~baseMonth: int): Alcobar.gen(fuzzConfig) =>
+  Alcobar.map([
+    Alcobar.const("single"),
+    captionLayoutGen,
+    Alcobar.bool,
+    navLayoutGen,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    optionGen(Alcobar.const("Fuzz test")),
+    Alcobar.bool,
+    rangeGen(~min=1, ~max=3),
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    optionGen(dateGen(~baseYear, ~baseMonth)),
+    Alcobar.const(None),
+    Alcobar.const(None),
+    Alcobar.const(None),
+  ], (
     mode,
-    captionLayout: randomCaptionLayout(),
-    reverseYears: randomBool(),
-    navLayout: randomNavLayout(),
-    disableNavigation: randomBool(),
-    hideNavigation: randomBool(),
-    animate: randomBool(),
-    fixedWeeks: randomBool(),
-    footerText: if (randomBool()) {Some("Fuzz test")} else {None},
-    hideWeekdays: randomBool(),
-    numberOfMonths: randomInt(~min=1, ~max=3),
-    reverseMonths: randomBool(),
-    pagedNavigation: randomBool(),
-    showOutsideDays: randomBool(),
-    showWeekNumber: randomBool(),
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
     singleDate,
-    multipleDates: None,
-    rangeFrom: None,
-    rangeTo: None,
-  };
-};
-
-let generateMultipleConfig = (~seed, ~baseYear, ~baseMonth): fuzzConfig => {
-  Random.init(seed);
-  let mode = "multiple";
-  let count = randomInt(~min=1, ~max=5);
-  let multipleDates =
-    if (randomBool()) {
-      Some(Array.init(count, _ => randomDate(~baseYear, ~baseMonth)));
-    } else {
-      None;
-    };
-  
-  {
-    name: "fuzz-multiple-" ++ string_of_int(seed),
-    mode,
-    captionLayout: randomCaptionLayout(),
-    reverseYears: randomBool(),
-    navLayout: randomNavLayout(),
-    disableNavigation: randomBool(),
-    hideNavigation: randomBool(),
-    animate: randomBool(),
-    fixedWeeks: randomBool(),
-    footerText: if (randomBool()) {Some("Fuzz test")} else {None},
-    hideWeekdays: randomBool(),
-    numberOfMonths: randomInt(~min=1, ~max=3),
-    reverseMonths: randomBool(),
-    pagedNavigation: randomBool(),
-    showOutsideDays: randomBool(),
-    showWeekNumber: randomBool(),
-    singleDate: None,
     multipleDates,
-    rangeFrom: None,
-    rangeTo: None,
-  };
-};
-
-let generateRangeConfig = (~seed, ~baseYear, ~baseMonth): fuzzConfig => {
-  Random.init(seed);
-  let mode = "range";
-  let hasRange = randomBool();
-  let rangeFrom = hasRange ? Some(randomDate(~baseYear, ~baseMonth)) : None;
-  let rangeTo =
-    switch (rangeFrom) {
-    | Some(from) =>
-      let fromDay = Js.Date.getDate(from);
-      let toDay = fromDay +. float_of_int(randomInt(~min=0, ~max=14));
-      Some(Js.Date.make(
-        ~year=Js.Date.getFullYear(from),
-        ~month=Js.Date.getMonth(from),
-        ~date=toDay,
-        ~hours=12.0,
-        ~minutes=0.0,
-        ~seconds=0.0,
-        (),
-      ));
-    | None => None
-    };
-  
-  {
-    name: "fuzz-range-" ++ string_of_int(seed),
-    mode,
-    captionLayout: randomCaptionLayout(),
-    reverseYears: randomBool(),
-    navLayout: randomNavLayout(),
-    disableNavigation: randomBool(),
-    hideNavigation: randomBool(),
-    animate: randomBool(),
-    fixedWeeks: randomBool(),
-    footerText: if (randomBool()) {Some("Fuzz test")} else {None},
-    hideWeekdays: randomBool(),
-    numberOfMonths: randomInt(~min=1, ~max=3),
-    reverseMonths: randomBool(),
-    pagedNavigation: randomBool(),
-    showOutsideDays: randomBool(),
-    showWeekNumber: randomBool(),
-    singleDate: None,
-    multipleDates: None,
     rangeFrom,
     rangeTo,
-  };
-};
+  ) => {
+    name: "fuzz-single",
+    mode,
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
+    singleDate,
+    multipleDates,
+    rangeFrom,
+    rangeTo,
+  });
 
-let generateConfig = (~seed, ~baseYear, ~baseMonth): fuzzConfig => {
-  let modeType = Random.int(3);
-  switch (modeType) {
-  | 0 => generateSingleConfig(~seed, ~baseYear, ~baseMonth)
-  | 1 => generateMultipleConfig(~seed, ~baseYear, ~baseMonth)
-  | _ => generateRangeConfig(~seed, ~baseYear, ~baseMonth)
-  };
-};
+let multipleConfigGen = (~baseYear: int, ~baseMonth: int): Alcobar.gen(fuzzConfig) =>
+  Alcobar.map([
+    Alcobar.const("multiple"),
+    captionLayoutGen,
+    Alcobar.bool,
+    navLayoutGen,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    optionGen(Alcobar.const("Fuzz test")),
+    Alcobar.bool,
+    rangeGen(~min=1, ~max=3),
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.const(None),
+    optionGen(Alcobar.array(dateGen(~baseYear, ~baseMonth))),
+    Alcobar.const(None),
+    Alcobar.const(None),
+  ], (
+    mode,
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
+    singleDate,
+    multipleDates,
+    rangeFrom,
+    rangeTo,
+  ) => {
+    name: "fuzz-multiple",
+    mode,
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
+    singleDate,
+    multipleDates,
+    rangeFrom,
+    rangeTo,
+  });
+
+let rangePairGen = (~baseYear: int, ~baseMonth: int) =>
+  Alcobar.choose([
+    Alcobar.const((None, None)),
+    Alcobar.map([
+      dateGen(~baseYear, ~baseMonth),
+      rangeGen(~min=0, ~max=14),
+    ], (from, offset) => {
+      let fromDay = int_of_float(Js.Date.getDate(from));
+      let toDay = float_of_int(fromDay + offset);
+      (
+        Some(from),
+        Some(
+          Js.Date.make(
+            ~year=Js.Date.getFullYear(from),
+            ~month=Js.Date.getMonth(from),
+            ~date=toDay,
+            ~hours=12.0,
+            ~minutes=0.0,
+            ~seconds=0.0,
+            (),
+          ),
+        ),
+      );
+    }),
+  ]);
+
+let rangeConfigGen = (~baseYear: int, ~baseMonth: int): Alcobar.gen(fuzzConfig) =>
+  Alcobar.map([
+    Alcobar.const("range"),
+    rangePairGen(~baseYear, ~baseMonth),
+    captionLayoutGen,
+    Alcobar.bool,
+    navLayoutGen,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    optionGen(Alcobar.const("Fuzz test")),
+    Alcobar.bool,
+    rangeGen(~min=1, ~max=3),
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.bool,
+    Alcobar.const(None),
+    Alcobar.const(None),
+  ], (
+    mode,
+    (rangeFrom, rangeTo),
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
+    singleDate,
+    multipleDates,
+  ) => {
+    name: "fuzz-range",
+    mode,
+    captionLayout,
+    reverseYears,
+    navLayout,
+    disableNavigation,
+    hideNavigation,
+    animate,
+    fixedWeeks,
+    footerText,
+    hideWeekdays,
+    numberOfMonths,
+    reverseMonths,
+    pagedNavigation,
+    showOutsideDays,
+    showWeekNumber,
+    singleDate,
+    multipleDates,
+    rangeFrom,
+    rangeTo,
+  });
+
+let configGen = (~baseYear: int, ~baseMonth: int): Alcobar.gen(fuzzConfig) =>
+  Alcobar.choose([
+    singleConfigGen(~baseYear, ~baseMonth),
+    multipleConfigGen(~baseYear, ~baseMonth),
+    rangeConfigGen(~baseYear, ~baseMonth),
+  ]);

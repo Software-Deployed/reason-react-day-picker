@@ -10,7 +10,7 @@ homepage: "https://github.com/Software-Deployed/reason-react-day-picker"
 bug-reports:
   "https://github.com/Software-Deployed/reason-react-day-picker/issues"
 depends: [
-  "dune" {>= "3.20"}
+  "dune" {>= "3.21"}
   "ocaml"
   "melange"
   "reason"
@@ -19,6 +19,8 @@ depends: [
   "reason-react"
   "server-reason-react"
   "alcotest" {with-test}
+  "crowbar" {with-test}
+  "alcobar" {with-test}
   "odoc" {with-doc}
 ]
 build: [
