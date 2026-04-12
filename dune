@@ -1,9 +1,9 @@
 (library
- (wrapped false)
- (modules ReactDayPicker)
  (name react_day_picker)
  (public_name reason-react-day-picker)
+ (wrapped false)
+ (modules ReactDayPicker)
  (modes melange)
  (libraries reason-react melange.js)
  (preprocess
-  (pps melange.ppx reason-react-ppx)))
+  (pps server-reason-react.browser_ppx -js melange.ppx reason-react-ppx)))

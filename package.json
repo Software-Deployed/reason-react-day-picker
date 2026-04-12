@@ -1,0 +1,16 @@
+{
+  "name": "reason-react-day-picker-tests",
+  "private": true,
+  "scripts": {
+    "test:browser": "./example/test-browser/run-browser-test.sh"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-day-picker": "^9.6.4",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "esbuild": "^0.28.0"
+  }
+}

@@ -1,4 +1,4 @@
-(lang dune 3.20)
+(lang dune 3.21)
 
 (name reason-react-day-picker)
 
@@ -15,6 +15,11 @@
 
 (using melange 0.1)
 
+(pin
+ (url "git+https://github.com/ml-in-barcelona/server-reason-react.git")
+ (package
+  (name server-reason-react)))
+
 (package
  (name reason-react-day-picker)
  (synopsis "Melange bindings for react-day-picker")
@@ -24,9 +29,12 @@
   melange
   reason
   melange-webapi
-  ppxlib
   reason-react-ppx
-  reason-react)
+  reason-react
+  server-reason-react
+   (alcotest :with-test)
+   (crowbar :with-test)
+   (alcobar :with-test))
  (allow_empty)
  (tags
   ("melange" "reason" "bindings" "react-day-picker" "react")))

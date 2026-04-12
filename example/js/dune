@@ -1,0 +1,9 @@
+(copy_files# "../shared/*.re")
+
+(melange.emit
+ (target render)
+ (module_systems
+  (commonjs re.js))
+ (libraries reason-react-day-picker reason-react melange.js)
+ (preprocess
+  (pps melange.ppx reason-react-ppx)))
